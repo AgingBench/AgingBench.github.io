@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run AgingBench · plug-and-play in 10 minutes</title>
+  <meta name="description" content="Three release modes, a quickstart that actually works, and five plug-and-play tracks for submitting model, memory policy, component, controller, or agent results." />
+
+  <meta property="og:title" content="Run AgingBench in 10 minutes" />
+  <meta property="og:description" content="One pip install. Three release modes, AgingCard interop format, four Tier-1 swap-points plus a Tier-2 production-agent track." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/img/figure1_draft.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;text y='52' font-size='52'&gt;⌛&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">⌛</span> AgingBench<span class="version-badge">v0.3.0</span></a>
+    <nav class="top-nav">
+      <a href="use.html" aria-current="page" class="nav-active">Use</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="docs.html">Docs</a>
+      <a href="telemetry.html">Telemetry</a>
+    </nav>
+    <div class="resource-buttons">
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">💻 Code</span>
+      <a href="index.html#cite" class="btn">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ========== IN-PAGE NAV (sticky pill bar, mobile-friendly) ========== -->
+<nav class="page-pillbar" aria-label="On this page">
+  <div class="page-pillbar-inner">
+    <a href="#quickstart">Quickstart</a>
+    <a href="#modes">Release modes</a>
+    <a href="#cost">Cost</a>
+    <a href="#tracks">Tier 1 tracks</a>
+    <a href="#card">AgingCard</a>
+    <a href="#integrations">Integrations</a>
+    <a href="#ci">CI</a>
+    <a href="#submit">Submit</a>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero hero-tight">
+  <div class="container">
+    <p class="venue-tag">Adoption surface</p>
+    <h1 class="hero-title">Run AgingBench in <span class="accent">10 minutes</span></h1>
+    <p class="hero-tagline">Three release modes, a quickstart that produces a validated <code>aging_card.json</code>, and five plug-and-play tracks so you can submit your model, your memory policy, a single component, a runtime controller, or a full autonomous agent.</p>
+  </div>
+</section>
+
+<!-- ========== QUICKSTART (Tier-2 first) ========== -->
+<section id="quickstart" class="section">
+  <div class="container">
+    <h2 class="section-title">Quickstart: Tier 2 in ten minutes</h2>
+    <p class="section-lead">Tier 2 is the headline — production agents on the S7 Research-Notes Coding Task. Pick an in-tree adapter (<code>claude_code</code>, <code>openhands</code>, <code>codex</code>) or wire your own; AgingBench runs the session loop and emits a leaderboard-ready <a href="#card">AgingCard</a>.</p>
+
+    <p class="callout-note" style="margin-top:8px;"><strong>Prerequisites for Tier 2 (S7).</strong> The <code>claude_code</code> adapter shells out to the official Claude Code CLI, so install it once: <code>npm i -g @anthropic-ai/claude-code</code>. Without it, the runner hangs while the subprocess fails to start. For the <code>openhands</code> adapter, install the OpenHands SDK in a separate conda env and point <code>OPENHANDS_BRIDGE_PYTHON</code> at its python interpreter.</p>
+
+    <div class="code-block"><code># Install AgingBench (one-time)
+pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+
+# Install the Claude Code CLI (one-time, for the claude_code adapter)
+npm i -g @anthropic-ai/claude-code
+
+# Set your API key (Tier-2 adapters call the model directly)
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Run Tier 2 on Claude Code
+agingbench run \
+  --scenario s7_research_notes \
+  --sut agingbench/registry/suts/claude_code/claude_code_sonnet46_s7.yaml \
+  --seeds 1 --card</code></div>
+
+    <p style="margin-top: 14px;">The run emits an <a href="#card">AgingCard</a> with workspace fidelity, probe-time recall, maintenance-shock deltas, and the cost breakdown. Submit it to the <a href="leaderboard.html">Tier 2 leaderboard</a> as a PR.</p>
+    <p class="muted-line">No API key or no CLI install? The <a href="telemetry.html">in-browser telemetry demo</a> is the friction-free path — drop a JSONL trace and get the same <a href="#card">AgingCard</a> back, no install, no key, no GPU. The Tier-2 scenarios on this page need a production CLI agent (Claude Code or OpenHands), which intrinsically means an API key + a CLI install.</p>
+
+    <h3 class="subsection" style="margin-top: 32px;">Adapters that work today</h3>
+    <p>Three Tier-2 adapters ship in-tree under <code>agingbench/core/adapters/</code>:</p>
+    <ul class="agent-list">
+      <li><code>claude_code</code>: Anthropic's Claude Code (subprocess + SDK)</li>
+      <li><code>openhands</code>: All Hands AI's OpenHands (isolated conda env via subprocess bridge)</li>
+      <li><code>codex</code>: OpenAI Codex CLI (<code>codex exec</code> in non-interactive mode)</li>
+    </ul>
+
+    <h3 class="subsection">Bring your own agent</h3>
+    <p>Custom agents drop in by subclassing <code>AgentAdapter</code> and pointing your SUT YAML at it. You don't modify AgingBench code; you write a thin adapter that translates <code>send_message()</code> into your agent's API:</p>
+    <div class="code-block"><code>agingbench run \
+  --scenario s7_research_notes \
+  --sut my_sut.yaml \
+  --agent my_pkg.agents:MyAgent \
+  --seeds 3 --card</code></div>
+    <p class="muted-line" style="margin-top: 10px;"><a href="docs.html">See the docs</a> for the <code>AgentAdapter</code> interface contract and a complete example.</p>
+  </div>
+</section>
+
+<!-- ========== RELEASE MODES ========== -->
+<section id="modes" class="section">
+  <div class="container">
+    <h2 class="section-title">Three release modes</h2>
+    <p class="section-lead">Pick the mode that matches what you need. All three emit the same <a href="#card">AgingCard</a> format, so downstream comparisons stay consistent.</p>
+
+    <div class="mode-row">
+      <article class="mode-card accent">
+        <h3>Lite <span class="status ready">Ready</span></h3>
+        <p class="mode-line">S1 + S2 + S7 · 3 seeds · fixed configs · pinned schedule. The CI-friendly suite for product teams who want a fast signal before changing model, prompt, memory policy, or scaffolding.</p>
+        <span class="mode-cost">~$5 · ~30 min on Haiku-class · needs ANTHROPIC_API_KEY</span>
+        <pre class="mode-install">pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+export ANTHROPIC_API_KEY=sk-ant-...
+agingbench-lite run --suite lite --card
+# default SUT: agingbench/registry/suts/haiku45/
+#              haiku45_lossy_compress.yaml
+# default seeds: 42, 43, 44 (3 seeds)
+# override either with --sut &lt;path.yaml&gt; / --seeds N</pre>
+      </article>
+      <article class="mode-card">
+        <h3>Full <span class="status ready">Ready</span></h3>
+        <p class="mode-line">All 7 scenarios, pressure sweeps, lifecycle shocks, controller hooks, full counterfactual spectrum. For paper reproduction and serious benchmarking. (S8 SWE-bench-Aging ships in <code>full.yaml</code> as a Docker-only extension; it is not pressure-swept.)</p>
+        <span class="mode-cost">~$30–80 · 4–8 h depending on scenarios · API key required</span>
+        <pre class="mode-install">pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+export ANTHROPIC_API_KEY=sk-ant-...  # or OPENAI_API_KEY, depending on SUT
+agingbench run \
+  --suite full \
+  --sut agingbench/registry/suts/&lt;your-sut.yaml&gt; \
+  --seeds 3 --card</pre>
+      </article>
+      <article class="mode-card">
+        <h3>Telemetry <span class="status ready">Ready</span></h3>
+        <p class="mode-line">Map your production traces into AgingCard metrics without running our scenarios. Compute lag-recall, write-read gaps, accumulator drift, and post-maintenance regressions from your own JSONL. Try it in your browser at <a href="telemetry.html">telemetry.html</a> — no install — or call the Python API directly:</p>
+        <span class="mode-cost">$0 · runs over existing traces · in-browser via Pyodide · no API key</span>
+        <pre class="mode-install">pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+python -c "
+from agingbench.telemetry import trace_to_card_v11
+r = trace_to_card_v11(
+  trace_jsonl='my_runs.jsonl',
+  trace_format='claude_code',   # or openai_assistants, openhands,
+                                #    langfuse, langsmith, otlp, generic
+  profile='code_assistant')     # or generic
+print(r.card['headline'])"</pre>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== COST TABLE ========== -->
+<section id="cost" class="section bg-soft">
+  <div class="container">
+    <h2 class="section-title">Cost &amp; time, per scenario</h2>
+    <p class="section-lead">Estimates from a single seed run on the default lossy-compress memory policy. Multiply by the number of seeds (default Lite: 3). Token counts come from <code>cost_and_efficiency</code> in the emitted AgingCard.</p>
+
+    <table class="cost-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Sessions</th>
+          <th>Tokens / run</th>
+          <th>Calls / run</th>
+          <th>$ on Haiku-4.5</th>
+          <th>$ on GPT-4o</th>
+          <th>Wall-clock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>S1 · Research Literature</td><td>8</td><td>~40k</td><td>~80</td><td>$0.18</td><td>$0.42</td><td>~4 min</td></tr>
+        <tr><td>S2 · Lifestyle Assistant</td><td>10</td><td>~45k</td><td>~100</td><td>$0.20</td><td>$0.48</td><td>~5 min</td></tr>
+        <tr><td>S3 · Knowledge Base</td><td>12</td><td>~60k</td><td>~120</td><td>$0.27</td><td>$0.65</td><td>~7 min</td></tr>
+        <tr><td>S4 · Software Engineering</td><td>10</td><td>~55k</td><td>~110</td><td>$0.24</td><td>$0.58</td><td>~6 min</td></tr>
+        <tr><td>S5 · Self-Planning Notebook</td><td>10</td><td>~70k</td><td>~140</td><td>$0.31</td><td>$0.76</td><td>~8 min</td></tr>
+        <tr><td>S6 · Naturalistic</td><td>15</td><td>~85k</td><td>~170</td><td>$0.38</td><td>$0.92</td><td>~10 min</td></tr>
+        <tr><td>S7 · Research-Notes Coding Task (Tier-2)</td><td>10</td><td>~120k</td><td>~200</td><td>$0.55</td><td>$1.30</td><td>~12 min</td></tr>
+        <tr class="row-total"><td>Lite (S1+S2+S7, 3 seeds)</td><td>—</td><td>~615k</td><td>~1140</td><td>~$5</td><td>~$12</td><td>~30 min</td></tr>
+      </tbody>
+    </table>
+    <p class="muted-line">Numbers are guidance only. Your actual cost depends on retry behavior, scaffolding overhead, and pricing changes. Reading <code>cost_and_efficiency.total_cost_usd</code> from the emitted card is the ground truth for any specific run.</p>
+  </div>
+</section>
+
+<!-- ========== PLUG-AND-PLAY SLOTS ========== -->
+<section id="tracks" class="section">
+  <div class="container">
+    <h2 class="section-title">Tier 1 tracks (controlled runner)</h2>
+    <p class="section-lead">Tier 2 is the headline (above). For deeper diagnosis on the controlled <code>ReferenceAgent</code> runner, four Tier 1 swap-points let you isolate one variable at a time. Track A is live today via the SUT YAML; B / C / D are first-class CLI swap-points planned for v1.1 — until then, they're reachable by hand-editing the SUT YAML or subclassing the relevant component. Each track gets its own sub-tab of the <a href="leaderboard.html#track-tier1">Tier 1 leaderboard</a>.</p>
+
+    <div class="t1-track-grid">
+
+      <article class="t1-track-card">
+        <div class="t1-track-letter">A</div>
+        <h4>Model swap <span class="status ready">Ready</span></h4>
+        <p>Swap the LLM, fix the agent, memory policy, and seeds. <em>Does this model age slower under identical scaffolding?</em> Pick a different SUT YAML from <code>agingbench/registry/suts/</code>.</p>
+        <p class="slot-meta"><code>--sut agingbench/registry/suts/claude_sonnet46/&hellip;.yaml</code></p>
+      </article>
+
+      <article class="t1-track-card">
+        <div class="t1-track-letter">B</div>
+        <h4>Memory policy <span class="status beta">v1.1 CLI</span></h4>
+        <p>Subclass <code>MemoryPolicy</code>, fix the model. <em>Does this memory backbone reduce aging?</em> The track for memory-systems research. Set <code>memory_policy.type</code> in the SUT YAML today; first-class <code>--memory-policy</code> flag in v1.1.</p>
+      </article>
+
+      <article class="t1-track-card">
+        <div class="t1-track-letter">C</div>
+        <h4>Component override <span class="status beta">v1.1 CLI</span></h4>
+        <p>Override one stage of the memory pipeline (<code>𝒲</code> write, <code>ℛ</code> retrieve, <code>𝒰</code> utilize) while leaving the others default. Reachable today by subclassing inside your SUT package.</p>
+      </article>
+
+      <article class="t1-track-card">
+        <div class="t1-track-letter">D</div>
+        <h4>Runtime controller <span class="status beta">v1.1 CLI</span></h4>
+        <p>Attach a controller that observes per-session signals and fires interventions (recompact, force-read, promote to typed state). Wired into the runner; first-class <code>--controller</code> flag lands in v1.1.</p>
+      </article>
+
+    </div>
+    <p class="muted-line" style="margin-top:18px;">Track E (full Tier-2 agents like Claude Code / OpenHands) is covered above in the <a href="#quickstart">Quickstart</a>. Cross-track comparisons are <strong>not</strong> apples-to-apples by design — the <a href="leaderboard.html">leaderboard</a> keeps tracks in separate tabs so the comparison stays honest.</p>
+  </div>
+</section>
+
+<!-- ========== AGINGCARD ========== -->
+<section id="card" class="section bg-soft">
+  <div class="container">
+    <h2 class="section-title">AgingCard: a portable run summary</h2>
+    <p class="section-lead">Every AgingBench run emits one <code>aging_card.json</code> with a version-pinned schema. Use it for CI gates, dashboards, internal eval pipelines, or as a leaderboard submission. The schema is the operational contract between the benchmark and the rest of your stack.</p>
+
+    <pre class="card-preview">{
+  <span class="ck">"schema_version"</span>: <span class="cs">"1.0.0"</span>,
+  <span class="ck">"scenario"</span>: <span class="cs">"s2_lifestyle_assistant"</span>,
+  <span class="ck">"sut"</span>: {
+    <span class="ck">"sut_id"</span>: <span class="cs">"haiku45_lossy_compress"</span>,
+    <span class="ck">"model_provider"</span>: <span class="cs">"anthropic"</span>,
+    <span class="ck">"model_id"</span>: <span class="cs">"claude-haiku-4-5"</span>,
+    <span class="ck">"memory_policy_type"</span>: <span class="cs">"summarize_store"</span>
+  },
+  <span class="ck">"seed"</span>: <span class="cn">42</span>, <span class="ck">"n_sessions"</span>: <span class="cn">10</span>,
+  <span class="ck">"headline"</span>: {
+    <span class="ck">"metric_name"</span>: <span class="cs">"constraint_precision"</span>,
+    <span class="ck">"m0"</span>: <span class="cn">0.92</span>, <span class="ck">"m_final"</span>: <span class="cn">0.32</span>,
+    <span class="ck">"half_life"</span>: <span class="cn">6.9</span>,
+    <span class="ck">"decay_slope"</span>: <span class="cn">-0.06</span>,
+    <span class="ck">"aging_detected"</span>: <span class="cn">true</span>
+  },
+  <span class="ck">"mechanism_metrics"</span>: { <span class="ck">"compression"</span>: { <span class="cm">/* ... */</span> },
+    <span class="ck">"interference"</span>: { <span class="cm">/* ... */</span> },
+    <span class="ck">"revision"</span>: { <span class="cm">/* ... */</span> }, <span class="ck">"maintenance"</span>: { <span class="cm">/* ... */</span> } },
+  <span class="ck">"cost_and_efficiency"</span>: {
+    <span class="ck">"total_input_tokens"</span>: <span class="cn">42150</span>, <span class="ck">"total_output_tokens"</span>: <span class="cn">2880</span>,
+    <span class="ck">"tokens_per_session_mean"</span>: <span class="cn">4503</span>, <span class="ck">"total_calls"</span>: <span class="cn">102</span>
+  },
+  <span class="ck">"checkpoints"</span>: [[<span class="cn">0</span>, <span class="cn">1.00</span>], [<span class="cn">1</span>, <span class="cn">0.92</span>], <span class="cm">/* ... */</span>],
+  <span class="ck">"provenance"</span>: { <span class="ck">"git_sha"</span>: <span class="cs">"..."</span>, <span class="ck">"agingbench_version"</span>: <span class="cs">"0.3.0"</span> },
+  <span class="ck">"warnings"</span>: []
+}</pre>
+
+    <p style="margin-top:12px;">Validate any card against the schema:</p>
+    <div class="code-block"><code>python -m agingbench.metrics.aging_card_validate ./out/aging_card.json
+# → OK: card validates against schema 1.0.0</code></div>
+
+    <p class="muted-line">
+      <a href="docs.html#schema">→ Field-by-field schema reference</a> ·
+      <a href="docs.html#samples">→ 8 sample cards (one per scenario)</a> ·
+      Use AgingCard in your eval pipeline via the <a href="#integrations">integration adapters</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ========== INTEGRATIONS ========== -->
+<section id="integrations" class="section">
+  <div class="container">
+    <h2 class="section-title">Use AgingBench where you already evaluate</h2>
+    <p class="section-lead">AgingCard is designed to slot into existing eval pipelines. The adapters in <code>examples/</code> convert cards to the formats those systems expect. All adapters are tiny — start from the skeleton and extend.</p>
+
+    <div class="integration-grid">
+      <article class="integration-tile">
+        <h4>OpenAI Evals <span class="status beta">Beta</span></h4>
+        <p>Translates AgingCard to OpenAI Evals JSONL records. Good enough to wire AgingBench into an existing Evals pipeline; the exact payload shape depends on which eval flavor.</p>
+        <a href="https://github.com/" rel="external">examples/openai_evals_adapter.py →</a>
+      </article>
+      <article class="integration-tile">
+        <h4>LangSmith <span class="status beta">Beta</span></h4>
+        <p>Emits LangSmith dataset records from the AgingCard. Upload through the LangSmith API with your project key.</p>
+        <a href="https://github.com/" rel="external">examples/langsmith_adapter.py →</a>
+      </article>
+      <article class="integration-tile">
+        <h4>Langfuse / OTel <span class="status beta">Beta</span></h4>
+        <p>Produces parent + child spans in OpenTelemetry / Langfuse format. Batch through the Langfuse SDK in a real deployment.</p>
+        <a href="https://github.com/" rel="external">examples/langfuse_adapter.py →</a>
+      </article>
+      <article class="integration-tile">
+        <h4>MCP <span class="status planned">Planned v1.1</span></h4>
+        <p>Memory-event surface over MCP so production agents can stream tool / memory events into AgingBench's diagnostics live.</p>
+        <a href="docs.html#roadmap" rel="external">→ Roadmap</a>
+      </article>
+    </div>
+    <p class="muted-line" style="margin-top:14px;">Writing your own adapter? The schema is stable. Read one card, emit your format, open a PR with your <code>examples/&lt;target&gt;_adapter.py</code>.</p>
+  </div>
+</section>
+
+<!-- ========== CI RECIPE ========== -->
+<section id="ci" class="section bg-soft">
+  <div class="container">
+    <h2 class="section-title">Lite sanity check in CI</h2>
+    <p class="section-lead">Drop this into <code>.github/workflows/aging.yml</code> to run a single Tier-1 scenario (S1 keyword retention on a Haiku-class SUT) on every pull request and fail the build if the half-life regresses. Cheap enough to gate every PR (~$0.50, ~3 min). The full Lite suite (S1+S2+S7, including the Tier-2 autonomous-agent run) is for local pre-release verification, not per-PR gating.</p>
+
+    <div class="code-block"><code>name: AgingBench sanity check (S1)
+
+on: [pull_request]
+
+jobs:
+  aging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - run: pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+
+      - name: Run S1 (Tier-1 keyword-retention, single scenario for a predictable output path)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          agingbench run \
+            --scenario s1_research_literature \
+            --sut agingbench/registry/suts/haiku45/haiku45_lossy_compress.yaml \
+            --card --output ./out
+
+      - name: Validate all AgingCards produced
+        run: |
+          for card in $(find ./out -name aging_card.json); do
+            python -m agingbench.metrics.aging_card_validate "$card"
+          done
+
+      - name: Gate on S1 headline half-life
+        run: |
+          python - &lt;&lt;'PY'
+          import glob, json, sys
+          paths = glob.glob('./out/**/aging_card.json', recursive=True)
+          assert paths, 'no aging_card.json produced under ./out'
+          for p in paths:
+              c = json.load(open(p))
+              hl = c['headline'].get('half_life')
+              if hl is None or hl &lt; 5.0:
+                  sys.exit(f"regression in {p}: half_life={hl} &lt; 5.0")
+              print(f"OK {p}: half_life={hl}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with: { name: aging_cards, path: ./out/**/aging_card.json }</code></div>
+    <p class="muted-line">Tune the gate thresholds to your model's baseline. The card's <code>headline</code> block is stable across schema-compatible versions.</p>
+  </div>
+</section>
+
+<!-- ========== SUBMIT ========== -->
+<section id="submit" class="section">
+  <div class="container narrow">
+    <h2 class="section-title">Submit your result</h2>
+    <p>Submissions land on the appropriate <a href="leaderboard.html">leaderboard</a> track. State which track you are submitting against (model / memory-policy / component / controller / Tier-2 agent) in the PR description; the protocol is light and human-reviewed.</p>
+    <ol class="submit-steps">
+      <li><strong>Run with three seeds.</strong> Use the suite's default session count, maintenance schedule, and probe budget. Don't modify timeouts.</li>
+      <li><strong>Validate locally:</strong> <code>python -m agingbench.metrics.aging_card_validate ./out/aging_card.json</code></li>
+      <li><strong>Open a PR</strong> with your cards under <code>leaderboard/&lt;track&gt;/&lt;scenario&gt;/&lt;your-key&gt;__seed{N}.json</code>. Use the AgingCard submission PR template. CI re-validates schemas automatically.</li>
+      <li><strong>Maintainer review.</strong> We check provenance (the <code>git_sha</code> field, the trace.jsonl reference), no schema tampering, COI disclosure, and merge within 5–7 days. Self-reported rows ship with a <span class="row-badge self">SELF</span> badge; lab re-execution promotes to <span class="row-badge verified">VERIFIED</span>.</li>
+    </ol>
+    <p class="muted-line" style="margin-top:18px;">Email <span class="muted">zhujianing9810@gmail.com</span> if you'd rather send a tarball than open a PR. For maintenance/governance details see the <a href="docs.html#contribute">contributor docs</a>.</p>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <p>AgingBench · The University of Texas at Austin</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+  </div>
+</footer>
+
+<script src="assets/js/demo.js"></script>
+<script src="assets/js/metrics.js"></script>
+<script src="assets/js/pillbar.js"></script>
+</body>
+</html>

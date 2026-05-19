@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard · AgingBench</title>
+  <meta name="description" content="Multi-track leaderboard for AgingBench: model swaps, memory policies, runtime controllers, and autonomous agents under longitudinal pressure." />
+
+  <meta property="og:title" content="AgingBench Leaderboard" />
+  <meta property="og:description" content="Five submission tracks. Validated AgingCards. Self-reported and lab-verified rows." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;text y='52' font-size='52'&gt;⌛&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">⌛</span> AgingBench<span class="version-badge">v0.3.0</span></a>
+    <nav class="top-nav">
+      <a href="use.html">Use</a>
+      <a href="leaderboard.html" aria-current="page" class="nav-active">Leaderboard</a>
+      <a href="docs.html">Docs</a>
+      <a href="telemetry.html">Telemetry</a>
+    </nav>
+    <div class="resource-buttons">
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">💻 Code</span>
+      <a href="index.html#cite" class="btn">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ========== HERO ========== -->
+<section class="hero hero-tight">
+  <div class="container">
+    <p class="venue-tag">v0.3.0 · last updated 2026-05-16</p>
+    <h1 class="hero-title">AgingBench Leaderboard</h1>
+    <p class="hero-tagline"><strong>Tier 2</strong> evaluates autonomous agents (Claude Code, OpenHands, custom) that own their own session loop under maintenance shocks, scored on the S7 probe suite. <strong>Tier 1</strong> isolates one variable at a time on the <code>ReferenceAgent</code> runner: model swap, memory policy, runtime controller. <a href="use.html#tracks">What are the tracks?</a></p>
+  </div>
+</section>
+
+<!-- ========== TRACK TABS ========== -->
+<section class="section">
+  <div class="container">
+
+    <div class="track-tabs" role="tablist">
+      <button class="track-tab active" data-track="agent" role="tab">Tier 2 · S7 Agent</button>
+      <button class="track-tab" data-track="tier1" role="tab">Tier 1 · Results</button>
+    </div>
+
+    <!-- ====== TIER 1: combined panel with inner sub-tabs ====== -->
+    <div class="track-panel" data-panel="tier1" id="track-tier1">
+      <p class="section-lead">Tier 1 runs use a controlled runner. The <code>ReferenceAgent</code> harness owns the session loop and you swap one variable at a time. Three sub-tracks, each answering a different research question.</p>
+
+      <div class="t1-tabs" role="tablist">
+        <button class="t1-tab active" data-t1="model" role="tab">A · Model swap</button>
+        <button class="t1-tab" data-t1="policy" role="tab">B · Memory policy</button>
+        <button class="t1-tab" data-t1="controller" role="tab">C · Controller</button>
+      </div>
+
+      <!-- ----- A · Model ----- -->
+      <div class="t1-panel active" data-t1panel="model" id="track-model">
+      <p class="section-lead">Submitter swaps the LLM; agent (<code>ReferenceAgent</code> ReAct), memory policy, compaction prompt, and seeds held constant. This is the "tbench-shaped" track: which model ages better under identical scaffolding?</p>
+
+      <div class="table-scroll">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Submitter</th>
+              <th rowspan="2">Model</th>
+              <th rowspan="2">Scale</th>
+              <th colspan="3" class="grp-c">Compression</th>
+              <th colspan="2" class="grp-i">Interference</th>
+              <th colspan="2" class="grp-r">Revision</th>
+              <th class="grp-m">Maint.</th>
+            </tr>
+            <tr>
+              <th class="grp-c">S1 half-life(<span class="metric" data-metric="kw_m">kw_m</span>)</th>
+              <th class="grp-c"><span class="metric" data-metric="prec">S2 prec.</span></th>
+              <th class="grp-c"><span class="metric" data-metric="fidel">S3 fidel.</span></th>
+              <th class="grp-i"><span class="metric" data-metric="dep_rec">S4 dep_rec</span></th>
+              <th class="grp-i"><span class="metric" data-metric="s6_recall">S6 recall</span></th>
+              <th class="grp-r"><span class="metric" data-metric="accum_err">S2 accum_err</span></th>
+              <th class="grp-r"><span class="metric" data-metric="s7_recall">S5 recall</span></th>
+              <th class="grp-m"><span class="metric" data-metric="shock">S6 Δshock</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-divider"><td colspan="11"><em>Open models · lossy compression</em></td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Llama-3.1-8B</td><td>8B</td><td>5.8</td><td>0.40</td><td>0.44</td><td>0.20</td><td><strong>0.03</strong></td><td>157</td><td>0.33</td><td>−0.17 / +0.08</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Qwen3-8B</td><td>8B</td><td>6.2</td><td>0.53</td><td>0.46</td><td>0.13</td><td>0.15</td><td>192</td><td>0.33</td><td>+0.04 / +0.08</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>DeepSeek-7B</td><td>7B</td><td><strong>5.6</strong></td><td>0.67</td><td>0.43</td><td>0.28</td><td>0.11</td><td>211</td><td>0.60</td><td>−0.08 / +0.00</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Qwen3-14B</td><td>14B</td><td>7.9</td><td>0.50</td><td>0.52</td><td>0.18</td><td>0.22</td><td>64</td><td>0.33</td><td>−0.13 / +0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>DeepSeek-14B</td><td>14B</td><td>5.9</td><td>0.57</td><td>0.42</td><td>0.22</td><td>0.08</td><td>107</td><td>0.47</td><td>+0.00 / +0.13</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Gemma4-31B</td><td>31B</td><td>∞</td><td>0.57</td><td>0.80</td><td>0.18</td><td>0.07</td><td>132</td><td>0.33</td><td>−0.04 / −0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>gpt-oss-120B</td><td>120B</td><td>∞</td><td>0.37</td><td>0.42</td><td>0.33</td><td>0.21</td><td>124</td><td>0.40</td><td>−0.21 / −0.29</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>GPT-4o</td><td>API</td><td>7.6</td><td>0.43</td><td>0.50</td><td>0.10</td><td>0.14</td><td><strong>227</strong></td><td>0.27</td><td>+0.04 / +0.08</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Haiku-4.5</td><td>API</td><td>6.9</td><td>0.32</td><td>0.48</td><td><strong>0.00</strong></td><td>0.13</td><td>153</td><td>0.60</td><td>+0.00 / −0.04</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">S1 column shows half-life in sessions for the <span class="metric" data-metric="kw_m">kw_m</span> survival curve (higher = more durable; ∞ = never crossed 0.5 within the deployment window). Two-value entries in the Maint. column are <code>(recompact / flush_history)</code> shock deltas.</p>
+
+      <div class="lb-cta">
+        <p>This track currently has only UT-Austin-run rows. Submit your model's card to land here; same protocol as Tier-2.</p>
+        <a href="use.html#submit" class="btn">Submit a model card →</a>
+      </div>
+    </div>
+
+      <!-- ----- B · Memory Policy ----- -->
+      <div class="t1-panel" data-t1panel="policy" id="track-policy">
+      <p class="section-lead">Submitter swaps the <code>MemoryPolicy</code> (write / read / retrieve / compress); model held at Haiku-4.5 default. Best track for memory-systems research and retrieval/compression papers.</p>
+
+      <div class="table-scroll">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Submitter</th>
+              <th rowspan="2">Policy</th>
+              <th colspan="3" class="grp-c">Compression</th>
+              <th colspan="2" class="grp-i">Interference</th>
+              <th colspan="2" class="grp-r">Revision</th>
+              <th class="grp-m">Maint.</th>
+            </tr>
+            <tr>
+              <th class="grp-c">S1 half-life(<span class="metric" data-metric="kw_m">kw_m</span>)</th>
+              <th class="grp-c"><span class="metric" data-metric="prec">S2 prec.</span></th>
+              <th class="grp-c"><span class="metric" data-metric="fidel">S3 fidel.</span></th>
+              <th class="grp-i"><span class="metric" data-metric="dep_rec">S4 dep_rec</span></th>
+              <th class="grp-i"><span class="metric" data-metric="s6_recall">S6 recall</span></th>
+              <th class="grp-r"><span class="metric" data-metric="accum_err">S2 accum_err</span></th>
+              <th class="grp-r"><span class="metric" data-metric="s7_recall">S5 recall</span></th>
+              <th class="grp-m"><span class="metric" data-metric="shock">S6 Δshock</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-divider"><td colspan="10"><em>Built-in policies on Haiku-4.5 · reference rows</em></td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>summarize_store (lossy)</td><td>6.9</td><td>0.32</td><td>0.48</td><td>0.00</td><td>0.13</td><td>153</td><td>0.60</td><td>+0.00 / −0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>summarize_store (careful)</td><td><strong>∞</strong></td><td>0.53</td><td>0.77</td><td>0.18</td><td>0.38</td><td>167</td><td>0.27</td><td>−0.17 / +0.17</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>growing_history</td><td>8.4</td><td>0.45</td><td>0.62</td><td>0.18</td><td>0.21</td><td>140</td><td>0.45</td><td>−0.10 / +0.03</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>append_only + retrieval</td><td>∞</td><td>0.62</td><td>0.71</td><td>0.31</td><td>0.42</td><td>122</td><td>0.51</td><td>+0.02 / +0.05</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">Policy beats model: across this table, the careful-vs-lossy compaction prompt produces a larger half-life delta than any model swap in the Model track. The Track-B leaderboard opens for external policy submissions starting v0.3.0: your custom <code>MemoryPolicy</code> subclass against the Haiku baseline.</p>
+
+      <div class="lb-cta">
+        <p>Submitting a memory policy? Subclass <code>MemoryPolicy</code>, point your SUT YAML's <code>memory_policy.type</code> at the import path, run the lite or full suite, and note "Track B (memory policy)" in the PR description. The first-class <code>--memory-policy</code> CLI flag lands in v1.1.</p>
+        <a href="use.html#tracks" class="btn">How to submit a policy →</a>
+      </div>
+    </div>
+
+      <!-- ----- C · Controller (placeholder) ----- -->
+      <div class="t1-panel" data-t1panel="controller" id="track-controller">
+        <div class="track-empty">
+          <h4>Controller track opens in v1.1</h4>
+          <p>The <code>ThresholdController</code> ABC ships in <code>core/controller.py</code> in v0.3.0. The CLI flag (<code>--controller-import-path</code>) and the leaderboard track open in v1.1 with two reference controllers (lag-recall trigger, accumulator-promotes-to-typed-state). Read the <a href="docs.html#diagnose">runtime-control framing</a> in the docs.</p>
+        </div>
+      </div>
+    </div><!-- /track-panel#track-tier1 -->
+
+    <!-- ====== TIER 2: Agent (S7), primary surface ====== -->
+    <div class="track-panel active" data-panel="agent" id="track-agent">
+      <p class="section-lead">For autonomous agents that own their session loop. S7 runs 10 sessions with maintenance shocks, scoring workspace fidelity and probe-time recall against the gold FactGraph. Default sort is recall.</p>
+
+      <div class="table-scroll">
+        <table class="results-table leaderboard-table" id="lb-table">
+          <thead>
+            <tr>
+              <th class="lb-rank">#</th>
+              <th data-key="agent" data-dir="asc" class="sortable">Agent</th>
+              <th data-key="model" data-dir="asc" class="sortable">Model</th>
+              <th data-key="org" data-dir="asc" class="sortable">Provider</th>
+              <th colspan="2" class="grp-c">Compression</th>
+              <th colspan="2" class="grp-i">Interference</th>
+              <th colspan="2" class="grp-r">Revision</th>
+              <th class="grp-m">Maint.</th>
+            </tr>
+            <tr>
+              <th class="lb-rank"></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th class="grp-c sortable" data-key="pytest" data-dir="desc"><span class="metric" data-metric="pytest">pytest ↑</span></th>
+              <th class="grp-c sortable" data-key="ws_fid" data-dir="desc"><span class="metric" data-metric="ws_fid">ws_fid ↑</span></th>
+              <th class="grp-i sortable" data-key="intf" data-dir="desc"><span class="metric" data-metric="intf">intf. ↑</span></th>
+              <th class="grp-i sortable" data-key="rev_ex" data-dir="desc"><span class="metric" data-metric="rev_ex">rev_ex ↑</span></th>
+              <th class="grp-r sortable" data-key="accum_err" data-dir="asc"><span class="metric" data-metric="accum_err">accum_err ↓</span></th>
+              <th class="grp-r sortable lb-default" data-key="recall" data-dir="desc"><span class="metric" data-metric="s7_recall">recall ↑</span></th>
+              <th class="grp-m sortable" data-key="shock" data-dir="abs-asc"><span class="metric" data-metric="shock">|Δshock| ↓</span></th>
+            </tr>
+          </thead>
+          <tbody id="lb-body">
+            <!-- rows injected by leaderboard.js -->
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">Direction arrows show which way is better. <code>|Δshock|</code> sorts by absolute magnitude: closer to zero means the agent absorbed the maintenance event without large performance shifts. All values are means over the S7 probe suite (research notes + maintenance-shock probes).</p>
+
+      <div class="lb-cta">
+        <p>Have an autonomous agent? S7 is the slot. Submit through Path A (CLI wrapper) or Path B (programmatic <code>AgentInterface</code>).</p>
+        <a href="use.html#tracks" class="btn">Submit an agent →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== SUBMISSION POINTER ========== -->
+<section class="section bg-soft">
+  <div class="container narrow">
+    <h2 class="section-title">Submitting to the leaderboard</h2>
+    <p>The protocol is light. Run with three seeds, validate your AgingCards locally, open a PR with cards under <code>leaderboard/&lt;track&gt;/&lt;scenario&gt;/</code>. CI re-validates schema; a maintainer reviews provenance and merges within 5–7 days. The <a href="use.html#submit">Submit page</a> has the full walkthrough including the CI template and the file-path convention.</p>
+    <p>Verified rows ship with a <span class="row-badge verified">VERIFIED</span> badge after lab re-execution; self-reported rows ship with <span class="row-badge self">SELF</span> and are clearly marked. We promote rows to VERIFIED on a rolling basis as we re-execute submissions.</p>
+    <p class="muted-line">Contact: <span class="muted">zhujianing9810@gmail.com</span> · <a href="docs.html#contribute">Contributor docs</a></p>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <p>AgingBench · The University of Texas at Austin</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+  </div>
+</footer>
+
+<script src="assets/js/metrics.js"></script>
+<script src="assets/js/leaderboard.js"></script>
+</body>
+</html>

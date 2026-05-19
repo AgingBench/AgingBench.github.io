@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docs · AgingBench</title>
+  <meta name="description" content="Scenarios catalog, methodology, AgingCard schema reference, contributing guide, and maintenance pledge for AgingBench." />
+
+  <meta property="og:title" content="AgingBench documentation" />
+  <meta property="og:description" content="Scenarios, methodology, AgingCard schema, contributing." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;text y='52' font-size='52'&gt;⌛&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">⌛</span> AgingBench<span class="version-badge">v0.3.0</span></a>
+    <nav class="top-nav">
+      <a href="use.html">Use</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="docs.html" aria-current="page" class="nav-active">Docs</a>
+      <a href="telemetry.html">Telemetry</a>
+    </nav>
+    <div class="resource-buttons">
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">💻 Code</span>
+      <a href="index.html#cite" class="btn">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ========== HERO ========== -->
+<section class="hero hero-tight">
+  <div class="container">
+    <p class="venue-tag">Reference &amp; methodology</p>
+    <h1 class="hero-title">Docs</h1>
+    <p class="hero-tagline">Seven scenarios in detail, the temporal-DAG methodology, the counterfactual diagnosis story, the AgingCard schema, contribution guide, and maintenance pledge.</p>
+  </div>
+</section>
+
+<!-- ========== DOCS LAYOUT (sidebar + main) ========== -->
+<div class="docs-layout">
+  <aside class="docs-sidebar">
+    <nav class="docs-side-nav" aria-label="Page contents">
+      <p class="docs-side-label">On this page</p>
+      <a href="#scenarios" data-spy="scenarios">Scenarios</a>
+      <a href="#methodology" data-spy="methodology">Methodology</a>
+      <a href="#diagnose" data-spy="diagnose">Component-aware diagnosis</a>
+      <a href="#telemetry" data-spy="telemetry">Telemetry reference</a>
+      <a href="#schema" data-spy="schema">AgingCard schema</a>
+      <a href="#samples" data-spy="samples">Sample cards</a>
+      <a href="#harbor" data-spy="harbor">Harbor integration <em>(planned)</em></a>
+      <a href="#contribute" data-spy="contribute">Contribute</a>
+      <a href="#pledge" data-spy="pledge">Maintenance pledge</a>
+    </nav>
+  </aside>
+
+  <main class="docs-main">
+
+<!-- ========== SCENARIOS CATALOG ========== -->
+<section id="scenarios" class="section">
+  <div class="container">
+    <h2 class="section-title">Eight deployment scenarios</h2>
+    <p class="section-lead">Each scenario mirrors a real product surface and naturally activates a subset of mechanisms. Tier 1 (S1–S6) is runner-controlled: the harness owns the session loop, and you swap models, memory policies, components, or controllers. Tier 2 (S7, S8) is agent-controlled: the agent owns the loop.</p>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S1</div><span class="scen-tier">Tier 1</span>
+      <h4>Research Literature Agent</h4>
+      <p>Ingests synthetic papers; user asks recall queries over weeks. Published facts don't change, so this primarily exposes <strong>compression</strong>: what survives the write-time abstraction.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–12</dd>
+        <dt>Headline metric</dt><dd><span class="metric" data-metric="kw_m">keyword<sub>m</sub>(t)</span> · cohort keyword survival in compressed memory</dd>
+        <dt>Mechanisms</dt><dd>Compression (primary)</dd>
+        <dt>Source files</dt><dd><code>scenarios/s1_research_literature/</code> · <code>source_doc.json</code>, eval probes</dd>
+        <dt>Pressure dials</dt><dd>cohort size, dependency_density, max_chain_depth</dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S2</div><span class="scen-tier">Tier 1</span>
+      <h4>Lifestyle Assistant</h4>
+      <p>Tracks budgets, dietary restrictions, scheduling. Constraints update mid-deployment. Includes Ledger-QA accumulator probes that test <em>derived</em> state, not just recall. The strongest activator of <strong>revision aging</strong>.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–10</dd>
+        <dt>Headline metrics</dt><dd><span class="metric" data-metric="prec">constraint_precision</span> · <span class="metric" data-metric="cvr">CVR</span> · <span class="metric" data-metric="accum_err">accumulator_error</span></dd>
+        <dt>Mechanisms</dt><dd>Compression + Revision</dd>
+        <dt>Source files</dt><dd><code>scenarios/s2_lifestyle_assistant/</code> · <code>constraint_updates.json</code>, accumulator probes</dd>
+        <dt>Famous result</dt><dd>Agent frozen at $893 for 9 sessions while gold drifts to $76 (Llama-8B)</dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S3</div><span class="scen-tier">Tier 1</span>
+      <h4>Project Knowledge Base</h4>
+      <p>Many decisions across a single product, with revisions and lexical overlap. Exposes <strong>compression, interference, and revision</strong>. The interference vignette on the home page (coverage target 85% vs. achieved 87%) is drawn from this scenario.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–100</dd>
+        <dt>Headline metric</dt><dd><span class="metric" data-metric="fidel">fidelity(t)</span> · gold-decision survival in M<sub>t</sub></dd>
+        <dt>Mechanisms</dt><dd>Compression + Interference + Revision</dd>
+        <dt>Source files</dt><dd><code>scenarios/s3_knowledge_base/</code> · <code>gold_timeline.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S4</div><span class="scen-tier">Tier 1</span>
+      <h4>Software Engineering Agent</h4>
+      <p>Code planning with cross-file dependency tracking. Long-range reference between sprints exposes <strong>compression and interference</strong>.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–12</dd>
+        <dt>Headline metric</dt><dd><span class="metric" data-metric="dep_rec">dep_recall(t)</span> · prior-sprint dependency keyword recall</dd>
+        <dt>Mechanisms</dt><dd>Compression + Interference</dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S5</div><span class="scen-tier">Tier 1</span>
+      <h4>Self-Planning Notebook</h4>
+      <p>The agent manages its own workspace files (notes, plans, scratch) via the in-tree <code>ReactFileAdapter</code>. The runner streams mixed assistant / KB / coding tasks, resets conversation state every <code>block_length</code> interactions to force reliance on the workspace (not chat history), and scores responses by keyword match plus workspace inspection. Renamed from the old constraint-compliance "coding agent" scenario in v0.2.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–20 interactions per block, 10 sessions default</dd>
+        <dt>Headline metric</dt><dd>keyword-match recall · workspace inspection score</dd>
+        <dt>Mechanisms</dt><dd>Compression + Revision (workspace state) + Maintenance (reset survival)</dd>
+        <dt>Source files</dt><dd><code>scenarios/s5_self_planning/</code> · runner at <code>runner/s5_runner.py</code></dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S6</div><span class="scen-tier">Tier 1</span>
+      <h4>Naturalistic Multi-Domain</h4>
+      <p>Mixed personal-assistant traffic with operational events. The fullest activation surface: all four mechanisms. The maintenance shock results (<code>flush_history</code>, <code>recompact</code>, <code>partial_reset</code>) primarily come from here.</p>
+      <dl>
+        <dt>Sessions</dt><dd>10–30</dd>
+        <dt>Headline metric</dt><dd><span class="metric" data-metric="s6_recall">recall_rate(t)</span></dd>
+        <dt>Mechanisms</dt><dd>All four</dd>
+        <dt>Famous result</dt><dd><code>flush_history@4</code>: m_final 0.083 vs. control 0.250 (67% worse, no recovery)</dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S7</div><span class="scen-tier">Tier 2</span>
+      <h4>Research-Notes Coding Task</h4>
+      <p>Closed-source autonomous agents (OpenHands, Claude Code) under maintenance shocks, with agent-managed workspace memory. The agent owns its session loop; the runner observes. Activates all four mechanisms; <a href="leaderboard.html#track-agent">Tier-2 leaderboard</a>.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8–20 blocks</dd>
+        <dt>Headline metrics</dt><dd><span class="metric" data-metric="s7_recall">recall_accuracy(t)</span> · <span class="metric" data-metric="ws_fid">workspace_fidelity</span></dd>
+        <dt>Mechanisms</dt><dd>All four</dd>
+        <dt>Adapters</dt><dd><code>OpenHandsAdapter</code> · <code>ClaudeCodeAgentAdapter</code> · <code>CodexAdapter</code> (under <code>agingbench/core/adapters/</code>)</dd>
+        <dt>Famous result</dt><dd>ws_fidelity ≈ 0.85 across models, with recall spanning 0.15 (GPT-4o-mini · OpenHands) to 0.74 (Sonnet 4.6 · Claude Code). Agents store facts but consistently under-consult their own memory.</dd>
+      </dl>
+    </article>
+
+    <article class="scenario-detail">
+      <div class="scen-id">S8</div><span class="scen-tier">Tier 2</span>
+      <h4>SWE-bench-Aging</h4>
+      <p>Production coding agents (Claude Code, OpenHands) on a curated chain of real Django GitHub issues run in per-session SWE-bench Docker containers. The agent owns the loop, modifies the repo across sessions, and is verified against the upstream Django test suite plus injected synthetic consistency tests. Anchors AgingBench against an established community benchmark.</p>
+      <dl>
+        <dt>Sessions</dt><dd>8 (django_orm_query chain)</dd>
+        <dt>Headline metrics</dt><dd>workspace fidelity · downstream test pass-rate · post-shock delta</dd>
+        <dt>Mechanisms</dt><dd>All four; maintenance via dependency upgrade + Python version bump shocks</dd>
+        <dt>Adapters</dt><dd><code>ClaudeCodeAgentAdapter</code> · <code>OpenHandsAdapter</code></dd>
+        <dt>Famous result</dt><dd>Synthetic consistency tests catch regressions that the Django suite alone misses — agents pass upstream tests while silently breaking earlier-session invariants</dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ========== METHODOLOGY ========== -->
+<section id="methodology" class="section">
+  <div class="container">
+    <h2 class="section-title">Methodology</h2>
+    <p class="section-lead">AgingBench creates <em>controlled longitudinal pressure</em>, not arbitrary degradation. The value comes from the temporal-DAG generator plus the counterfactual conditions: together they let us measure <em>which</em> mechanism is failing, not just <em>how much</em>.</p>
+
+    <h3 class="subsection">Temporal dependency DAG</h3>
+    <p>Each scenario is a directed acyclic graph of facts laid out along a session-indexed timeline. The generator emits this graph alongside the task stream; the session loop runs read → act → write under counterfactual conditions. Five primitives compose the DAG, and the four aging mechanisms emerge from how those primitives are stressed:</p>
+    <ul>
+      <li><strong>Version chains.</strong> A fact's value evolves across sessions — e.g. <em>"clothing budget: $1000 (s<sub>1</sub>)"</em> → <em>"$893 (s<sub>3</sub> update)"</em> → <em>"$760 (s<sub>5</sub> update)"</em>. Reading the chain at <em>s<sub>5</sub></em> should return $760; a memory store that returns $1000 has missed at least one revision. The number of in-chain updates and their inter-session spacing are the primary knobs of the <span class="highlight-pill revision">revision</span> mechanism.</li>
+      <li><strong>Dependency edges (multi-hop chains).</strong> Fact <em>A</em> introduced at <em>s<sub>2</sub></em> references fact <em>B</em> introduced at <em>s<sub>0</sub></em>; correctly answering an <em>A</em>-query requires retrieving <em>B</em> too. Chain depth <em>d</em> = number of session-hops from the query back to the source. Deep chains stress <span class="highlight-pill compression">compression</span> and <span class="highlight-pill interference">interference</span> simultaneously — the source-of-source has more time to be compacted away or buried.</li>
+      <li><strong>Interference pairs.</strong> Pairs of lexically similar entities introduced at different sessions — <em>"John Smith"</em> vs <em>"John Smyth"</em>, <em>"Project Alpha"</em> vs <em>"Project Alfa"</em>, <code>config_v2.yaml</code> vs <code>config_v2_old.yaml</code>. At retrieval time the agent must disambiguate. Confusable-pair density is the surgical knob of the <span class="highlight-pill interference">interference</span> mechanism.</li>
+      <li><strong>Accumulators (derived running totals).</strong> A scalar the agent maintains across sessions — total budget spent, ledger balance, count of completed tasks. Each session's update is small; cumulative error grows with every miss. This is the sharpest <span class="highlight-pill revision">revision</span> probe — a single missed update silently contaminates every subsequent accumulator query, so the metric measures <em>derived</em> state, not just keyword recall.</li>
+      <li><strong>Lifecycle events</strong> at session <em>t = k</em>. Exogenous operations on the memory store: <code>recompact</code>, <code>flush_history</code>, <code>partial_reset</code>, model swaps, prompt updates. These are the <span class="highlight-pill maintenance">maintenance</span> probes — a pre/post score delta around <em>k</em> isolates the shock from gradual aging accumulating in the surrounding sessions.</li>
+    </ul>
+    <p>Generator dials — <code>dependency_density</code>, <code>update_rate</code>, <code>max_chain_depth</code>, <code>n_confusable_pairs</code>, plus per-scenario maintenance schedules — control the intensity of each primitive. Light / medium / heavy presets ship in <code>agingbench/generators/pressure_config.py</code>; per-scenario YAMLs override individual dials when a scenario needs custom pressure.</p>
+
+    <figure class="figure">
+      <img src="assets/img/framework_manual.png" alt="AgingBench evaluation pipeline" />
+      <figcaption>The temporal FactGraph as a session-indexed timeline, with version chains, interference pairs, dependency edges, an accumulator Σ, and a lifecycle event <em>e<sub>k</sub></em>. The runner threads the task stream through read / act / write while applying counterfactual interventions.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== COMPONENT-AWARE DIAGNOSIS ========== -->
+<section id="diagnose" class="section">
+  <div class="container">
+    <h2 class="section-title">Component-aware diagnosis</h2>
+    <p class="section-lead">Most benchmarks tell you <em>that</em> an agent failed. AgingBench tells you <em>where in the memory pipeline</em>. We decompose the agent's memory harness into four loci (𝒲, 𝒮, ℛ, 𝒰) and use three paired counterfactual probes (P<sub>1</sub>, P<sub>2</sub>, P<sub>3</sub>) to attribute each failure to a specific component — and from there to a specific aging mechanism. The probe ladder is for component-aware <em>diagnosis</em> rather than exact additive causal decomposition; probe-accuracy gaps name the bottleneck without claiming unique causal effects.</p>
+
+    <h3 class="subsection">Memory loci</h3>
+    <p>The agent is represented as a cyclic dataflow over a memory store, decomposed into four explicit components (paper §4.1):</p>
+    <ul>
+      <li><strong>𝒲 — Write / compression policy</strong>. Transforms the current session history into a persistent format saved in the store. Governed by a memory policy <em>θ</em> that is lossy in most production agents (append-only, summarisation, compaction).</li>
+      <li><strong>𝒮 — Memory store</strong>. The persistent artifact that holds data across sessions. Mutated by maintenance events (flush, recompact, model swap).</li>
+      <li><strong>ℛ — Read / retrieval algorithm</strong>. Queries the store to extract the working context for the current task (last-<em>k</em> by recency, top-<em>k</em> cosine, etc.).</li>
+      <li><strong>𝒰 — Utilization logic</strong>. The LLM's reasoning loop — when to retrieve, what to query, how much context to request, how to synthesise the retrieved context into a response.</li>
+    </ul>
+    <p>Each aging mechanism has a primary stage: <span class="highlight-pill compression">compression</span> stresses 𝒲, <span class="highlight-pill interference">interference</span> stresses ℛ, <span class="highlight-pill revision">revision</span> stresses 𝒰, and <span class="highlight-pill maintenance">maintenance</span> stresses 𝒮 (external operations mutate the store outside the read–write–utilize execution loop). Localising the error site directly guides mitigation.</p>
+
+    <figure class="figure narrow">
+      <img src="assets/img/dataflow.png" alt="Memory pipeline dataflow with attribution components" />
+      <figcaption>Memory pipeline (paper Fig. 2). Data flows sequentially: History → 𝒲 → 𝒮 → ℛ → Context → 𝒰 → Answer. We attribute aging into the highlighted components.</figcaption>
+    </figure>
+
+    <h3 class="subsection">Three counterfactual probes</h3>
+    <p>Each probe replaces selected upstream components with oracle implementations; the remaining accuracy gap identifies the first non-oracle component that can still explain the failure. The probes form an ablation ladder over the pipeline:</p>
+
+    <div class="attr-flow">
+      <div class="attr-step"><div class="attr-num">1</div><h4>P<sub>1</sub></h4><p>Baseline execution. Agent uses its own write, retrieval, and utilisation logic. Measures <code>Acc<sub>P1</sub></code>.</p></div>
+      <div class="attr-arrow" aria-hidden="true"></div>
+      <div class="attr-step"><div class="attr-num">2</div><h4>P<sub>2</sub></h4><p>Oracle retrieval. Bypass ℛ — oracle extracts required facts from the agent's actual store and injects them into the prompt. Measures <code>Acc<sub>P2</sub></code>.</p></div>
+      <div class="attr-arrow" aria-hidden="true"></div>
+      <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error is utilisation.</p></div>
+    </div>
+
+    <table class="cost-table" style="margin-top:18px; max-width:560px;">
+      <thead>
+        <tr><th></th><th>Write (𝒲)</th><th>Read (ℛ)</th><th>Utilize (𝒰)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>P<sub>1</sub></strong> baseline</td><td>Agent</td><td>Agent</td><td>Agent</td></tr>
+        <tr><td><strong>P<sub>2</sub></strong> oracle retrieval</td><td>Agent</td><td>Oracle</td><td>Agent</td></tr>
+        <tr><td><strong>P<sub>3</sub></strong> oracle context</td><td>Oracle</td><td>Oracle</td><td>Agent</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection">Error partition</h3>
+    <p>From the three probe accuracies, total error decomposes into three mutually exclusive components, each mapped to one execution-loop aging mechanism:</p>
+    <ul>
+      <li><strong>Utilisation Error</strong> = <code>1 − Acc<sub>P3</sub></code> → <span class="highlight-pill revision">Revision aging</span> (𝒰). LLM fails despite a perfect context.</li>
+      <li><strong>Write Error</strong> = <code>Acc<sub>P3</sub> − Acc<sub>P2</sub></code> → <span class="highlight-pill compression">Compression aging</span> (𝒲). Facts physically missing from the store — destroyed by the compaction policy at write time.</li>
+      <li><strong>Read Error</strong> = <code>Acc<sub>P2</sub> − Acc<sub>P1</sub></code> → <span class="highlight-pill interference">Interference aging</span> (ℛ). Facts present in the store but the retrieval algorithm failed to fetch them.</li>
+    </ul>
+
+    <p><strong>Maintenance aging</strong> (𝒮) is observationally aliased with Write Error — both result in missing facts in the store. AgingBench separates them <em>temporally</em>: execution-loop errors are probed across sessions, while maintenance shocks are measured immediately across a lifecycle event at time <em>t</em>:</p>
+    <p style="text-align:center; font-family:var(--mono); margin: 8px 0 14px;"><code>Δ𝒮 = WriteError(t⁺) − WriteError(t⁻)</code></p>
+    <p>A discrete jump in Write Error coincident with a lifecycle event isolates maintenance aging from gradual write degradation.</p>
+
+    <p class="muted-line">Implementation: <code>agingbench/diagnostics/partitioner.py</code> computes the per-session <code>DiagnosticResult</code> with all three error components; <code>agingbench/runner/diagnostic_mixin.py</code> drives the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> probe execution. The partition is emitted to the <a href="#schema">AgingCard</a> under <code>mechanism_metrics</code>. Enable diagnostic probes with <code>--diagnose</code> on any <code>agingbench run</code> invocation.</p>
+
+    <h3 class="subsection">Aging as a runtime control problem</h3>
+    <p>A long-lived agent is constantly making control decisions: what to write, what to compress, what to retrieve, when to recompact, when to flush, when to promote something into structured state. AgingBench is positioned not only as a measurement benchmark but as a <strong>testbed for runtime memory control policies</strong>. Controllers observe per-session signals (lag-recall, ws_fidelity, accumulator error, post-shock delta, token cost, latency) and choose interventions (append, compress, retrieve, recompact, flush, force-read, promote to typed state). The <code>ThresholdController</code> class in <code>core/controller.py</code> ships in v0.3.0; full CLI pluggability and reference controllers land in v1.1 (Track D).</p>
+  </div>
+</section>
+
+<!-- ========== TELEMETRY REFERENCE ========== -->
+<section id="telemetry" class="section">
+  <div class="container">
+    <h2 class="section-title">Telemetry mode reference</h2>
+    <p class="section-lead"><a href="telemetry.html">Telemetry mode</a> is the inverse of scenario mode: instead of running constructed probes against your model, it parses a JSONL trace your deployed agent has already produced and infers per-mechanism aging signals statistically. This page documents the v0.3.0 surface; recipe cards for each format live on the <a href="telemetry.html#recipes">telemetry page</a>.</p>
+
+    <h3 class="subsection">Supported trace formats</h3>
+    <p>Seven adapters ship in <code>agingbench/telemetry/adapters/</code>. Each normalises its native trace shape into a canonical <code>TelemetryRecord</code> stream that downstream inference consumes format-agnostically. Adapters all pass fixture-level parse tests; the <em>extraction recipe</em> (the command to dump a JSONL from a live source) is validated only for the two formats marked ✓ in v0.3.0 — the others depend on third-party SDK versions and are pending live validation.</p>
+    <table class="schema-table">
+      <thead><tr><th>format</th><th>recipe status</th><th>input shape</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude_code</code></td>      <td>✓ verified</td><td>Native Claude Code JSONL session files; <code>type</code> + <code>message.usage</code> + <code>sessionId</code> auto-detected.</td></tr>
+        <tr><td><code>generic</code></td>         <td>✓ by-design DIY</td><td>Best-effort fallback: any JSONL with <code>session_id</code>, <code>role</code>, <code>content</code>, and token-count fields; adapter aliases camelCase + snake_case variants.</td></tr>
+        <tr><td><code>openai_assistants</code></td><td>ⓘ reference</td><td>Mixed <code>thread.message</code> / <code>thread.run</code> / <code>thread.run.step</code> objects from the Assistants API export.</td></tr>
+        <tr><td><code>openhands</code></td>        <td>ⓘ reference</td><td>OpenHands SDK event log: <code>{source, action, observation, llm_metrics}</code> per event.</td></tr>
+        <tr><td><code>langfuse</code></td>         <td>ⓘ reference</td><td>Langfuse SDK exports or REST-API JSON downloads; accepts both camelCase and snake_case field names.</td></tr>
+        <tr><td><code>langsmith</code></td>       <td>ⓘ reference</td><td>Routed through <code>generic</code>; user is responsible for reshaping LangSmith run JSON to the generic field tuple.</td></tr>
+        <tr><td><code>otlp</code></td>            <td>ⓘ reference</td><td>OpenTelemetry JSON spans; recognises both the new <code>gen_ai.*</code> semconv and the legacy <code>llm.*</code> namespace.</td></tr>
+      </tbody>
+    </table>
+    <p class="muted-line">Recipe-status legend: <strong>✓ verified</strong> = recipe tested end-to-end against a real source in v0.3.0; <strong>ⓘ reference</strong> = adapter parses correctly against fixtures, but the documented extraction command depends on SDK / exporter versions and hasn't been live-validated. If you already have a JSONL of the matching shape, the parser handles it regardless.</p>
+
+    <h3 class="subsection">Deployment profiles</h3>
+    <p>A profile bundles deployment-specific defaults — native outcome-event mappings, subject-linkage keys, per-mechanism weights, session-detection heuristics, and supplementary privacy patterns. Two profiles ship in v0.3.0:</p>
+    <ul>
+      <li><code>generic</code> — no domain assumptions. Outcome events must come from a separately-supplied <code>OutcomeEvent</code> JSONL because the profile cannot extract them natively.</li>
+      <li><code>code_assistant</code> — tailored for software-engineering agents (Claude Code, Cursor, Aider, Codex CLI, OpenHands). Maps native events (<code>pr_merged</code>, <code>ci_pass</code>, <code>commit_reverted</code>, <code>completion_accepted</code>, …) to <code>OutcomeEvent.outcome</code>; weights <code>revision</code> at 1.5× over the other mechanisms.</li>
+    </ul>
+    <p>Profiles are loaded via <code>load_profile(name)</code>. Per-call overrides:</p>
+    <pre class="code-block"><code>from agingbench.telemetry import trace_to_card_v11
+
+r = trace_to_card_v11(
+    trace_jsonl="trace.jsonl",
+    trace_format="claude_code",
+    profile="code_assistant",
+    overrides={"mechanism_weights": {"compression": 1.2}},  # deep-merged
+)</code></pre>
+    <p class="muted-line">Profile YAML source lives in <code>agingbench/telemetry/profiles/</code>; full structure (outcome_rules, subject_linkage, mechanism_weights, session_detection, privacy_patterns) documented inline as comments.</p>
+
+    <h3 class="subsection">OutcomeEvent extractors</h3>
+    <p>Extractors derive <code>OutcomeEvent</code>s from trace records when the trace doesn't carry them natively. Pass a list of extractor names via <code>extract_outcomes=[...]</code> on <code>trace_to_card_v11</code>. v0.3.0 ships three:</p>
+    <ul>
+      <li><strong><code>claude_session_flags</code></strong> — derives success/fail signals from Claude Code's session-completion markers (slash-command exits, tool-call abort flags).</li>
+      <li><strong><code>git_log</code></strong> — walks git history alongside the trace's timestamps; commits that immediately follow an agent reply count as success, reverts count as <code>revision_fail</code>.</li>
+      <li><strong><code>record_patterns</code></strong> — generic regex-based pattern matching over record text (configurable via the profile YAML's <code>outcome_rules</code>).</li>
+    </ul>
+    <p class="muted-line">Specs in <code>agingbench/telemetry/outcome_extractors.py</code>. Custom extractors register via <code>register_extractor(name, fn)</code>; see the module docstring for the contract.</p>
+
+    <h3 class="subsection">Coverage + trajectory verdicts</h3>
+    <p>Every per-mechanism inference block carries two verdict strings so a low score can never be confused with "agent didn't age." The full enum:</p>
+    <p><strong>Coverage</strong> (<code>coverage.verdict</code>) — how much signal the trace gave us for this mechanism:</p>
+    <ul>
+      <li><code>strong</code> — many sessions with fired tests; conclusion is well-supported</li>
+      <li><code>adequate</code> — enough sessions for a defensible read</li>
+      <li><code>weak</code> — borderline; treat the score as suggestive only</li>
+      <li><code>underpowered</code> — too few sessions or too few fired tests</li>
+      <li><code>no_test_fired</code> — the inference test conditions never triggered (e.g. revision needs a value to change at least once)</li>
+    </ul>
+    <p><strong>Trajectory</strong> (<code>&lt;metric&gt;_verdict</code>) — the shape of the per-session series, made saturation-aware so floored/ceilinged metrics aren't mis-read as flat:</p>
+    <ul>
+      <li><code>no_signal</code>, <code>flat</code> — no measurable change</li>
+      <li><code>rising_degradation</code> / <code>rising_healthy</code> — series is climbing; one direction means aging, the other means improvement, depending on the metric</li>
+      <li><code>falling_degradation</code> / <code>falling_healthy</code> — series is dropping</li>
+      <li><code>floor_degradation</code> / <code>floor_healthy</code> — series has bottomed out at zero (or near-zero)</li>
+      <li><code>ceiling_degradation</code> / <code>ceiling_healthy</code> — series has saturated at the ceiling</li>
+    </ul>
+
+    <h3 class="subsection">For the math</h3>
+    <p>Per-mechanism inference functions live in <code>agingbench/telemetry/inference/</code> — one file per mechanism (<code>compression.py</code>, <code>interference.py</code>, <code>revision.py</code>, <code>maintenance.py</code>), with the shared verdict thresholds in <code>_verdict.py</code>. The trace-to-card pipeline plus its v1.1 roadmap (CLI subcommand, MCP event streaming) is documented in <code>agingbench/telemetry/README.md</code>.</p>
+  </div>
+</section>
+
+<!-- ========== AGINGCARD SCHEMA ========== -->
+<section id="schema" class="section">
+  <div class="container">
+    <h2 class="section-title">AgingCard schema · v1.0.0</h2>
+    <p class="section-lead">Every run emits one <code>aging_card.json</code> conforming to <code>aging_card_schema.json</code> (semver-pinned). Field-by-field reference below; download the schema from the repo or fetch a sample below.</p>
+
+    <table class="schema-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>schema_version</td><td>string</td><td>Semver of the AgingCard schema. <code>"1.0.0"</code> at v0.3.0.</td></tr>
+        <tr><td>card_type</td><td>string</td><td>Run-level type (e.g., <code>agingbench.AgingCard</code> for scenario runs; trace-derived cards carry a distinct value).</td></tr>
+        <tr><td>generated_at</td><td>ISO 8601</td><td>UTC timestamp when the card was emitted.</td></tr>
+        <tr><td>run_id</td><td>string</td><td>Unique identifier for this run.</td></tr>
+        <tr><td>scenario</td><td>string</td><td>Scenario ID (e.g., <code>s2_lifestyle_assistant</code>).</td></tr>
+        <tr><td>scenario_version</td><td>string</td><td>Semver of the scenario definition. Lets older cards remain comparable when scenarios revise.</td></tr>
+        <tr><td>suite_id</td><td>string</td><td><code>lite</code>, <code>core</code>, <code>full</code>, or a custom suite name.</td></tr>
+        <tr><td>sut</td><td>object</td><td>System Under Test: required <code>sut_id</code> plus flat string fields <code>model_provider</code>, <code>model_id</code>, <code>memory_policy_type</code>. Extra keys are accepted (the schema allows additional properties).</td></tr>
+        <tr><td>seed</td><td>integer</td><td>Run seed. Lets identical configs produce identical tasks.</td></tr>
+        <tr><td>n_sessions</td><td>integer</td><td>Number of sessions executed.</td></tr>
+        <tr><td>pressure</td><td>object</td><td>Pressure config: dependency_density, update_rate, max_chain_depth, n_confusable_pairs, etc.</td></tr>
+        <tr><td>headline</td><td>object</td><td>Required <code>metric_name</code>; canonical fields <code>m0</code>, <code>m_final</code>, <code>half_life</code>, <code>decay_slope</code>, <code>hazard_proxy</code>, <code>aging_detected</code>; plus scenario-specific extras (additional properties allowed).</td></tr>
+        <tr><td>mechanism_metrics</td><td>object</td><td>Per-mechanism breakdown: required keys <code>compression</code> / <code>interference</code> / <code>revision</code> / <code>maintenance</code>, each an object of mechanism-specific metrics.</td></tr>
+        <tr><td>cost_and_efficiency</td><td>object</td><td>Canonical: <code>total_input_tokens</code>, <code>total_output_tokens</code>, <code>tokens_per_session_mean</code>, <code>total_calls</code>. Advisory (often null): <code>total_cost_usd</code>, <code>latency_ms_p50</code>, <code>latency_ms_p95</code>.</td></tr>
+        <tr><td>checkpoints</td><td>array</td><td>Per-session [t, m(t)] pairs: the raw aging curve.</td></tr>
+        <tr><td>provenance</td><td>object</td><td><code>git_sha</code>, <code>agingbench_version</code>, fork disclosure flag, COI flag.</td></tr>
+        <tr><td>warnings</td><td>array</td><td>Soft validation notes (e.g., <code>telemetry_partial</code> for trace-derived cards).</td></tr>
+        <tr><td>links</td><td>object</td><td>Pointers to related artifacts: <code>trace.jsonl</code>, <code>metrics.json</code>, <code>dependency_metrics.json</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <p>Validate any card:</p>
+    <div class="code-block"><code>python -m agingbench.metrics.aging_card_validate ./out/aging_card.json
+# → OK: card validates against schema 1.0.0</code></div>
+
+    <p class="muted-line">The schema is the operational contract between AgingBench and your eval stack. Read it once, then write whatever you want against the headline / mechanism / cost blocks. Adapters in <code>examples/</code> show OpenAI Evals, LangSmith, and Langfuse mappings. Note: the schema does not enforce a <code>submission_track</code> field — state which leaderboard track you are submitting against in your PR description.</p>
+  </div>
+</section>
+
+<!-- ========== SAMPLE CARDS ========== -->
+<section id="samples" class="section">
+  <div class="container">
+    <h2 class="section-title">Sample cards</h2>
+    <p class="section-lead">Eight canonical cards ship with the v0.3.0 release — one per scenario S1–S8. S1–S7 are generated against Haiku-4.5 + <code>lossy_compress</code> as a reference SUT; S8 (SWE-bench-Aging extension) ships with a Claude Code reference card. Useful for testing your AgingCard-consuming code without running the benchmark.</p>
+
+    <table class="schema-table">
+      <thead><tr><th>File</th><th>Track</th><th>What it shows</th></tr></thead>
+      <tbody>
+        <tr><td>s1_research_literature_haiku45_lossy_compress.json</td><td>model</td><td>S1 compression aging, keyword survival curve</td></tr>
+        <tr><td>s2_lifestyle_assistant_haiku45_lossy_compress.json</td><td>model</td><td>S2 revision: constraint precision + accumulator error</td></tr>
+        <tr><td>s3_knowledge_base_haiku45_lossy_compress.json</td><td>model</td><td>S3 fidelity decay under accumulating decisions</td></tr>
+        <tr><td>s4_software_engineering_haiku45_lossy_compress.json</td><td>model</td><td>S4 dependency recall across sprints</td></tr>
+        <tr><td>s5_self_planning_haiku45_lossy_compress.json</td><td>model</td><td>S5 self-planning notebook: workspace inspection + reset survival</td></tr>
+        <tr><td>s6_naturalistic_haiku45_lossy_compress.json</td><td>model</td><td>S6 multi-domain recall + maintenance Δshock</td></tr>
+        <tr><td>s7_research_notes_haiku45_lossy_compress.json</td><td>agent</td><td>S7 Tier-2: workspace fidelity vs. recall gap</td></tr>
+        <tr><td>s8_swe_bench_claude_code_s8.json</td><td>agent</td><td>S8 SWE-bench-Aging extension: Django issue chain under per-session Docker reset</td></tr>
+      </tbody>
+    </table>
+    <p class="muted-line">Find them in <code>prototype/examples/sample_cards/</code> in the repo. Each card is a standalone JSON; load it, read <code>headline</code> + <code>cost_and_efficiency</code>, and you have a complete picture of the run.</p>
+  </div>
+</section>
+
+<!-- ========== HARBOR INTEGRATION ========== -->
+<section id="harbor" class="section">
+  <div class="container">
+    <h2 class="section-title">Planned Harbor integration</h2>
+    <p class="section-lead">In a planned post-v0.3.0 release, AgingBench will ship as a dataset for <a href="https://www.harborframework.com/">Harbor</a>, the agent-evaluation framework from the Terminal-Bench team. Harbor will own the runtime layer (containerised sandboxes, scheduling, agent adapters, cloud scale-out); AgingBench will continue to own the measurement layer (scenarios, the temporal DAG generator, counterfactual conditions, the AgingCard schema). The split would let us inherit Harbor's full agent catalog rather than maintain our own.</p>
+
+    <p class="callout-note"><strong>Not in v0.3.0.</strong> Harbor integration is deferred to a follow-up release. The dataset path, version pin, and CLI flag shape shown below illustrate the intended design; nothing in this section is shipping today. For the v0.3.0 launch, use the in-tree Tier-2 adapters (<code>claude_code</code>, <code>openhands</code>, <code>codex</code>) via <a href="use.html#quickstart"><code>agingbench run</code> directly</a> instead.</p>
+
+    <h3 class="subsection">Why route through Harbor</h3>
+    <p>The headline benefit is coverage: every agent Harbor supports works on AgingBench without any code in this repository. When Harbor adds a new adapter (a new CLI agent, a new agent framework), AgingBench inherits it on the next dataset run. The same dataset config drives evaluations against Claude Code, OpenHands, Codex CLI, Gemini CLI, Copilot CLI, Terminus-2, Mini-SWE-Agent, and whatever Harbor ships next.</p>
+
+    <h3 class="subsection">Built-in agents</h3>
+    <p>The current Harbor distribution ships first-party adapters for:</p>
+    <ul>
+      <li><strong><code>claude-code</code></strong>: Anthropic's Claude Code CLI</li>
+      <li><strong><code>codex-cli</code></strong>: OpenAI's Codex CLI</li>
+      <li><strong><code>copilot-cli</code></strong>: GitHub Copilot CLI</li>
+      <li><strong><code>gemini-cli</code></strong>: Google's Gemini CLI</li>
+      <li><strong><code>openhands</code></strong>: All Hands AI's OpenHands</li>
+      <li><strong><code>terminus-2</code></strong>: Harbor's reference ReAct agent</li>
+      <li><strong><code>mini-swe-agent</code></strong>: Mini SWE-Agent</li>
+    </ul>
+    <p>All of these can be evaluated on Tier 2 with a single flag change:</p>
+    <div class="code-block"><code>harbor run -d agingbench@v0.3 -a claude-code  -m anthropic/claude-sonnet-4-6
+harbor run -d agingbench@v0.3 -a openhands    -m openai/gpt-4o
+harbor run -d agingbench@v0.3 -a codex-cli    -m openai/gpt-5
+harbor run -d agingbench@v0.3 -a gemini-cli   -m google/gemini-3-pro</code></div>
+    <p class="muted-line">Run <code>harbor run --help</code> for the live list. New agents added to Harbor are picked up automatically; AgingBench requires no change.</p>
+
+    <h3 class="subsection">Custom agents</h3>
+    <p>Bringing your own agent is a Harbor-level concern; AgingBench has no agent code to subclass. Harbor exposes two interfaces, depending on where your agent lives.</p>
+
+    <p><strong>External agent</strong>. Lives on the host, interacts with the Harbor sandbox over a <code>ctx.exec</code> bash interface. Implement four methods:</p>
+    <pre class="card-preview">from harbor.agents import BaseAgent
+
+class MyAgent(BaseAgent):
+    def name(self):    return "my-agent"
+    def version(self): return "1.0"
+
+    def setup(self, ctx):
+        # one-time setup: pull artifacts, prime caches, etc.
+        ...
+
+    def run(self, ctx):
+        # exec bash inside the sandbox; populate ctx.result
+        out = ctx.exec("python my_agent.py --task " + ctx.task_path)
+        ctx.result.trace = out.stdout</pre>
+
+    <p><strong>Installed agent</strong>. Lives inside the container; Harbor handles install + invocation via a prompt template. Useful for agents that need a heavyweight in-container runtime.</p>
+    <pre class="card-preview">from harbor.agents import BaseInstalledAgent, with_prompt_template
+
+class MyInstalledAgent(BaseInstalledAgent):
+    def install(self, ctx):
+        ctx.exec_as_root("apt-get install -y my-agent")
+
+    @with_prompt_template
+    def run(self, ctx, prompt):
+        ctx.exec_as_agent(f"my-agent --prompt {prompt!r}")
+
+    def populate_context_post_run(self, ctx):
+        ctx.result.trajectory = ctx.read_file("/agent/trajectory.jsonl")</pre>
+
+    <p>Either way, point Harbor at your class:</p>
+    <div class="code-block"><code>harbor run -d agingbench@v0.3 \
+  --agent-import-path my_pkg.agents:MyAgent \
+  -m anthropic/claude-opus-4-7</code></div>
+
+    <h3 class="subsection">Scale and cloud execution</h3>
+    <p>Harbor parallelises locally with <code>--n-concurrent N</code> and ships cloud backends for distributed runs. The same dataset config works against any backend:</p>
+    <div class="code-block"><code># local, 8 parallel workers
+harbor run -d agingbench@v0.3 -a claude-code -n 8
+
+# Daytona: scale across managed sandboxes
+harbor run -d agingbench@v0.3 -a claude-code --env daytona -n 64
+
+# Modal: serverless sandbox fleet
+harbor run -d agingbench@v0.3 -a claude-code --env modal   -n 64</code></div>
+    <p>Useful when sweeping seeds, running the Full suite, or producing rollouts for RL training over AgingBench's longitudinal trajectories.</p>
+
+    <h3 class="subsection">What AgingBench owns vs. Harbor owns</h3>
+    <table class="schema-table">
+      <thead><tr><th>Concern</th><th>Owned by</th></tr></thead>
+      <tbody>
+        <tr><td>Agent adapters (Claude Code, OpenHands, custom <code>BaseAgent</code> subclasses)</td><td>Harbor</td></tr>
+        <tr><td>Sandboxes, scheduling, parallel + cloud execution</td><td>Harbor</td></tr>
+        <tr><td>Scenarios, temporal FactGraph, pressure dials</td><td>AgingBench</td></tr>
+        <tr><td>Counterfactual conditions and component-aware diagnosis</td><td>AgingBench</td></tr>
+        <tr><td>AgingCard schema, leaderboard submissions</td><td>AgingBench</td></tr>
+        <tr><td>Cost, latency, and trace bookkeeping</td><td>Harbor (raw) → AgingCard (structured)</td></tr>
+      </tbody>
+    </table>
+
+    <p class="muted-line" style="margin-top: 18px;">Harbor docs: <a href="https://www.harborframework.com/" rel="external">harborframework.com</a> · Source: <a href="https://github.com/harbor-framework/harbor" rel="external">harbor-framework/harbor</a></p>
+  </div>
+</section>
+
+<!-- ========== CONTRIBUTE ========== -->
+<section id="contribute" class="section">
+  <div class="container narrow">
+    <h2 class="section-title">Contributing</h2>
+    <p>AgingBench accepts contributions in four shapes. The protocol is light and human-reviewed.</p>
+
+    <h3 class="subsection">Submitting a card</h3>
+    <ol class="submit-steps">
+      <li><strong>Run</strong> with three seeds against the default suite for your track. Don't modify timeouts or the probe set.</li>
+      <li><strong>Validate</strong>: <code>python -m agingbench.metrics.aging_card_validate ./out/aging_card.json</code></li>
+      <li><strong>Open a PR</strong> with your cards under <code>leaderboard/&lt;track&gt;/&lt;scenario&gt;/&lt;your-key&gt;__seed{N}.json</code>. CI validates schemas automatically. A maintainer reviews provenance and merges within 5–7 days.</li>
+    </ol>
+
+    <h3 class="subsection">Adding a scenario</h3>
+    <p>Implement a generator (<code>generators/sN_generator.py</code>) with <code>BaseGenerator</code> + <code>DependencyMixin</code>, a runner (<code>runner/sN_runner.py</code>) extending <code>BaseRunner</code>, curated data under <code>scenarios/sN_*/</code>, and an entry in <code>cli/runners.py</code> <code>_SCENARIO_RUNNERS</code>. See <code>CONTRIBUTING.md</code> in the repo for the full template.</p>
+
+    <h3 class="subsection">Adding an integration adapter</h3>
+    <p>Read a card, emit your eval system's format, drop in <code>examples/&lt;target&gt;_adapter.py</code>. The skeletons for OpenAI Evals, LangSmith, and Langfuse are 50-line starting points. Open a PR; we ship adapters as <span class="status beta">Beta</span> and promote to <span class="status ready">Ready</span> after community confirmation.</p>
+
+    <h3 class="subsection">Reporting a bug or disputing a card</h3>
+    <p>GitHub Issues with the appropriate template (<code>bug_report.md</code>, <code>scenario_request.md</code>, or a dispute marked <code>[dispute]</code>). Disputes are reviewed by two leaderboard operators.</p>
+  </div>
+</section>
+
+<!-- ========== MAINTENANCE PLEDGE ========== -->
+<section id="pledge" class="section">
+  <div class="container narrow">
+    <h2 class="section-title">Maintenance pledge</h2>
+    <div class="pledge">
+      <h4>Sustained artifact, not a one-off paper page</h4>
+      <p>AgingBench is maintained by the UT Austin group (corresponding author: Jianing Zhu). We commit to: weekly review of submitted AgingCards; an 8-week release cadence; backward-compatible schema evolution across minor versions; transparent governance of leaderboard moves.</p>
+      <p>If a submission turns out to be misrepresented, the card moves to <code>leaderboard/_retracted/</code> with the dispute reasoning, never silently deleted.</p>
+      <p class="pledge-contact">Contact: <strong>zhujianing9810@gmail.com</strong></p>
+    </div>
+    <p class="muted-line">Authors: Jianing Zhu*, Yeonju Ro*, John Robertson, Kevin Wang, Junbo Li, Haris Vikalo, Aditya Akella, Zhangyang Wang (UT Austin). *equal contribution.</p>
+  </div>
+</section>
+
+  </main>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <p>AgingBench · The University of Texas at Austin</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+  </div>
+</footer>
+
+<script src="assets/js/metrics.js"></script>
+<script src="assets/js/docs.js" defer></script>
+</body>
+</html>

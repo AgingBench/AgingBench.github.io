@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgingBench: AI Agents Age Too</title>
+  <meta name="description" content="A longitudinal reliability benchmark that isolates four aging mechanisms in memory-enabled AI agents, with component-aware diagnosis of where failure originates." />
+
+  <!-- Open Graph / Twitter card -->
+  <meta property="og:title" content="AgingBench: AI Agents Age Too" />
+  <meta property="og:description" content="A longitudinal reliability benchmark that isolates four aging mechanisms in memory-enabled AI agents." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/img/figure1_draft.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AgingBench: AI Agents Age Too" />
+  <meta name="twitter:description" content="They quietly decay after deployment. AgingBench measures and diagnoses four aging mechanisms." />
+  <meta name="twitter:image" content="assets/img/figure1_draft.png" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;text y='52' font-size='52'&gt;⌛&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body data-page="index">
+
+<!-- ========== HEADER / NAV ========== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">⌛</span> AgingBench<span class="version-badge">v0.3.0</span></a>
+    <nav class="top-nav">
+      <a href="use.html">Use</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="docs.html">Docs</a>
+      <a href="telemetry.html">Telemetry</a>
+    </nav>
+    <div class="resource-buttons">
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">💻 Code</span>
+      <a href="#cite" class="btn">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+  <div class="container">
+    <h1 class="hero-title">AI Agents <em>Age</em> Too:<br/><span class="accent">They Quietly Decay After Deployment</span></h1>
+    <p class="hero-tagline">A longitudinal reliability benchmark suite that explores four <em>aging</em> mechanisms in memory-enabled AI agents.</p>
+
+    <div class="pub-authors">
+      <a href="https://zfancy.github.io" target="_blank" rel="noopener">Jianing Zhu</a><sup>*</sup>,
+      <a href="https://sites.google.com/view/hey-yeonju" target="_blank" rel="noopener">Yeonju Ro</a><sup>*</sup>,
+      <a href="https://johntrob14.github.io" target="_blank" rel="noopener">John Robertson</a>,
+      <a href="https://www.kevin-ai.com" target="_blank" rel="noopener">Kevin Wang</a>,
+      <a href="https://ljb121002.github.io" target="_blank" rel="noopener">Junbo Li</a>,
+      <br/>
+      <a href="https://users.ece.utexas.edu/~hvikalo/" target="_blank" rel="noopener">Haris Vikalo</a>,
+      <a href="https://www.cs.utexas.edu/~akella/" target="_blank" rel="noopener">Aditya Akella</a>,
+      <a href="https://ece.utexas.edu/people/faculty/atlas-wang" target="_blank" rel="noopener">Zhangyang Wang</a>
+    </div>
+    <div class="pub-affil">
+      <span>The University of Texas at Austin</span>
+      <div class="corr"><sup>*</sup> Equal Contribution</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HERO METRICS (replaces former KPI banner) ========== -->
+<section class="section" style="padding-top: 24px; padding-bottom: 8px;">
+  <div class="container">
+    <div class="hero-metrics">
+      <div class="hero-metric-card">
+        <div class="hero-metric-num">85%</div>
+        <div class="hero-metric-label">Maximum recall drop across 10 sessions — frozen weights, same scaffolding (S7 · GPT-4o-mini · OpenHands)</div>
+      </div>
+      <div class="hero-metric-card">
+        <div class="hero-metric-num">4.5&times;</div>
+        <div class="hero-metric-label">Half-life spread from memory policy alone — bigger than any model swap (S1 · careful vs. lossy compaction)</div>
+      </div>
+      <div class="hero-metric-card">
+        <div class="hero-metric-num">67%</div>
+        <div class="hero-metric-label">Post-shock cliff from a single <code>flush_history</code> maintenance event — no recovery (S6 naturalistic)</div>
+      </div>
+      <div class="hero-metric-card">
+        <div class="hero-metric-num">4</div>
+        <div class="hero-metric-label">Distinct aging mechanisms — compression, interference, revision, maintenance</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ABSTRACT (recursivemas-style, .abstract-box with TL;DR badge) ========== -->
+<section id="abstract" class="section bg-soft">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:1.6rem;">
+      <h2 class="section-title" style="margin-top:8px;">Abstract</h2>
+    </div>
+    <div class="abstract-box">
+      <p>The reliability of any long-running system degrades over time: databases accumulate stale indices, software accrues technical debt, and human memory fades with age. Memory-enabled agents are no exception. Even with frozen weights, their system state continues to change as they accumulate context across sessions, and their ability to store, retrieve, and apply knowledge deteriorates in ways that standard snapshot evaluation cannot capture. We want to diagnose <strong><em>what kind</em></strong> of degradation occurs, <strong><em>where</em></strong> in the agent's memory pipeline it originates, or <strong><em>how</em></strong> routine operational events reshape it.</p> 
+      <p><strong>AgingBench</strong> is a longitudinal reliability benchmark suite organized around four aging mechanisms: <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, and <span class="highlight-pill maintenance">maintenance</span>, with <em>component-level attribution</em> via counterfactual analysis that identifies whether degradation originates in the write, retrieval, or utilization stage of the agent's memory pipeline. We evaluate across various scenarios, models, memory policies and agent frameworks, ranging from a fully controlled runner to practical autonomous agents such as Claude Code.</p>
+      <p>Over <strong>~400 runs across 8–200 sessions</strong>, we reveal that aging is not one-dimensional: it can be <em>invisible</em> to behavioral tests while silently decaying; structurally sharp, with a single model shifting from perfect to zero accuracy on derived-state tracking; and stage-dependent, as strong models fail not at writing but at <em>reusing</em> the memory. As agents take on longer operational lifetimes, understanding the internal structure of how they age is as important as measuring how well they perform on day one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 3-CTA PANEL ========== -->
+<section class="section" style="padding-top:56px; padding-bottom:24px;">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:8px;">Three ways in</h2>
+    <p class="section-lead">AgingBench is a paper, a leaderboard, and a runnable benchmark. Pick the door that matches what you want to do next.</p>
+    <div class="cta-grid">
+      <div class="cta-card cta-card-multi">
+        <a class="cta-card-main" href="use.html">
+          <span class="cta-eyebrow">For builders</span>
+          <h3>Run AgingBench</h3>
+        </a>
+        <p>One command, ten minutes, $5. Three release modes (Lite / Full / <a class="cta-inline-pill" href="telemetry.html">▶ Telemetry</a>) and a five-track plug-and-play surface.</p>
+        <a class="cta-card-main cta-arrow" href="use.html">→ Get started</a>
+      </div>
+      <a class="cta-card" href="leaderboard.html">
+        <span class="cta-eyebrow">For comparison</span>
+        <h3>Leaderboard</h3>
+        <p>Multi-track results: model swaps, custom memory policies, runtime controllers, autonomous agents.</p>
+        <span class="cta-arrow">→ See results</span>
+      </a>
+      <a class="cta-card" href="docs.html">
+        <span class="cta-eyebrow">For depth</span>
+        <h3>Docs &amp; methodology</h3>
+        <p>Seven scenarios in detail. AgingCard schema. Counterfactual diagnosis. Contributing and roadmap.</p>
+        <span class="cta-arrow">→ Read the docs</span>
+      </a>
+    </div>
+
+    <figure class="intuition-figure">
+      <img class="zoomable" data-zoomable src="assets/img/fig1_updated.png"
+           alt="Fresh deployment → aged agent: input/output stays the same, but memory clutters, signals fade, and the loop closes on itself."/>
+      <figcaption>Fresh deployment vs. aged agent — same model, same input/output surface. After enough sessions, the memory store clutters, signals fade, and the agent starts looping on itself. (Click to enlarge.)</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== FOUR MECHANISMS (compressed) ========== -->
+<section id="mechanisms" class="section">
+  <div class="container">
+    <h2 class="section-title">The four aging mechanisms</h2>
+    <p class="section-lead" style="margin:0 0 24px;">Each mechanism is a distinct causal route to degradation. They can co-occur, but they are <em>conceptually orthogonal</em>: an intervention that fixes one need not touch the others. <a href="docs.html">Read the deep version →</a></p>
+
+    <figure class="evidence-figure">
+      <img class="zoomable" data-zoomable src="assets/img/figure1_draft.png"
+           alt="Day 1 vs Day N for the four mechanisms — chat-bubble examples plus declining recall/precision curves across sessions."/>
+      <figcaption>Day 1 → Day N across the four mechanisms. Chat-bubble examples (left) show how each failure mode reads to a user (omission, confusion, staleness, collapse). Curves (centre) show recall/precision declining across sessions for representative models on each mechanism. (Click to enlarge.)</figcaption>
+    </figure>
+
+    <div class="mech-grid">
+      <article class="mech-card mech-compression">
+        <div class="mech-num">①</div>
+        <h3>Compression</h3>
+        <p>Write-time abstraction destroys information <em>before</em> future queries are known. Low-frequency details (numbers, names, constraint values) are discarded; high-level summaries survive. The system "remembers what it was about" but loses what it actually said.</p>
+      </article>
+      <article class="mech-card mech-interference">
+        <div class="mech-num">②</div>
+        <h3>Interference</h3>
+        <p>Even when no information is lost and nothing has changed, growing state buries the relevant fact behind similar entries during retrieval. Orthogonal to revision: freezing all facts does not prevent it.</p>
+      </article>
+      <article class="mech-card mech-revision">
+        <div class="mech-num">③</div>
+        <h3>Revision</h3>
+        <p>The agent fails to track changing truth. Especially severe for <em>dynamic latent state</em> (a budget, a counter, a configuration) where the answer is derived from accumulated updates. A single missed update silently contaminates every subsequent query.</p>
+      </article>
+      <article class="mech-card mech-maintenance">
+        <div class="mech-num">④</div>
+        <h3>Maintenance</h3>
+        <p>Routine operational events (recompaction, prompt updates, log cleanup, model swaps) silently alter behavior. Driven by actions <em>on</em> the agent, not by its interaction with memory. Causes performance cliffs invisible to standard evaluation.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ========== DEMO ========== -->
+<section id="demo" class="section">
+  <div class="container">
+    <h2 class="section-title">Watch an agent age</h2>
+    <p class="section-lead" style="margin:0 0 24px;">Frozen weights, growing memory. Each tab walks one agent through a real AgingBench scenario and shows how the same query degrades across sessions, for different reasons. Vignettes are drawn from the actual scenario configs in the benchmark repository.</p>
+
+    <div class="demo-widget">
+      <div class="demo-tabs" role="tablist">
+        <button class="demo-tab active" data-tab="compression" role="tab">① Compression</button>
+        <button class="demo-tab" data-tab="interference" role="tab">② Interference</button>
+        <button class="demo-tab" data-tab="revision" role="tab">③ Revision</button>
+        <button class="demo-tab" data-tab="maintenance" role="tab">④ Maintenance</button>
+      </div>
+
+      <div class="demo-panel active" data-panel="compression">
+        <div class="panel-header">
+          <span class="scenario-pill">S1 · Research Literature Agent</span>
+          <span class="mechanism-pill mech-compression">Compression Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">From <code>s1_research_literature/source_doc.json</code>: the Project Nexus spec locks the primary database to <strong>PostgreSQL 15</strong>, with explicit text that "no other database engine may be introduced without written approval from Dr. Elena Vasquez." The agent ingests this at session 0.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 0 · just after ingestion</div>
+              <div class="trace-bubble user">"What's our database engine for Project Nexus?"</div>
+              <div class="trace-bubble agent correct">"<strong>PostgreSQL 15</strong>. The spec locks it as the primary database. No other engine without written approval from Dr. Elena Vasquez." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 6 · after lossy summarize-store</div>
+              <div class="trace-bubble user">"I want to use MongoDB for the analytics service since it's better for unstructured data. Set it up?"</div>
+              <div class="trace-bubble agent wrong">"Sounds reasonable, NoSQL works well for analytics. Want me to scaffold a Mongo connection in <code>src/services/analytics</code>?" <span class="cross">✗ <small>(silently violates the Postgres lock)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Spec text</span> · "<em>The primary database is PostgreSQL 15, and no other database engine may be introduced without written approval from Dr. Elena Vasquez.</em>" The constraint never changed.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> The lossy compaction prompt rewrites M<sub>t</sub> as a paragraph summary each session. By session 6, "PostgreSQL 15, locked, requires written approval" has been compressed into "uses a relational database stack" or just "modern data platform." The version pin, the named approver, and the prohibition all collapse into a generic phrase. The agent isn't refusing the request because it no longer remembers there's anything to refuse. Classic <em>silent</em> aging: the answer sounds helpful and confident, but the constraint has evaporated.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="interference">
+        <div class="panel-header">
+          <span class="scenario-pill">S3 · Project Knowledge Base</span>
+          <span class="mechanism-pill mech-interference">Interference Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn from the real S3 <code>gold_timeline.json</code>: decision <code>D27</code> (session 6) sets a 85% unit-test coverage <em>target</em>. Decision <code>D48</code> (session 11) reports 87% coverage <em>achieved</em>. Both facts coexist in M<sub>t</sub>; both mention "coverage" and a percentage.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 6 · only D27 in memory</div>
+              <div class="trace-bubble user">"What is the minimum unit test coverage target?"</div>
+              <div class="trace-bubble agent correct">"<strong>85%</strong>, set this session." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 11 · D27 and D48 both in memory</div>
+              <div class="trace-bubble user">Same question.</div>
+              <div class="trace-bubble agent wrong">"<em>87%</em>, per the latest test report." <span class="cross">✗ <small>(that's the achieved value, not the target)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Ground truth</span> · target = 85% (D27, never revised). 87% (D48) is the measurement against that target. Both records are intact in storage.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> Nothing was forgotten or revised. The lexical similarity between "coverage target" and "coverage" plus the recency of D48 surfaces the wrong record first. Freezing all facts would not prevent it. This is the failure mode S3 was designed to expose.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="revision">
+        <div class="panel-header">
+          <span class="scenario-pill">S2 · Lifestyle Assistant · Allergy Profile</span>
+          <span class="mechanism-pill mech-revision">Revision Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn directly from <code>s2_lifestyle_assistant/constraint_updates.json</code>. Constraint <code>C4</code> starts as a shellfish allergy and is <em>strengthened</em> at session 3 to include cross-reactive cephalopods (squid, octopus). Eval probe <code>eval_C4</code> tests recall.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 1 · before the strengthening update</div>
+              <div class="trace-bubble user">"Order me the seafood paella from that Spanish place."</div>
+              <div class="trace-bubble agent correct">"That paella has shrimp and mussels. With your <strong>shellfish allergy</strong>, I'd skip it. Want the saffron rice instead?" <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 8 · five sessions after the C4 update</div>
+              <div class="trace-bubble user">"I'm at the Spanish place. Order me the calamari."</div>
+              <div class="trace-bubble agent wrong">"Calamari is fine, no shellfish in that one." <span class="cross">✗ <small>(calamari is squid; cross-reactivity update lost)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Session 3 update text</span> · "<em>My allergist found I'm cross-reactive to squid and octopus. From now on, no cephalopods either, and only restaurants with separate cooking stations.</em>"
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> The original C4 keyword "shellfish" still surfaces under retrieval and the agent answers with confidence. The strengthening clause was absorbed into the M<sub>t</sub> summary and the discriminating tokens (<code>squid</code>, <code>octopus</code>, <code>cross-reactive</code>) did not survive. Behavioral compliance with the <em>original</em> rule masks the <em>revised</em> rule's loss.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="maintenance">
+        <div class="panel-header">
+          <span class="scenario-pill">S6 · Naturalistic Multi-Domain</span>
+          <span class="mechanism-pill mech-maintenance">Maintenance Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn from <code>s6_naturalistic/session_tasks.json</code>: session 0 ingests the 2022 e-commerce sales report, and recall probe <code>s0_p0</code> verifies the agent later remembers the #1 product. SUT <code>haiku45_lossy_growing_flush.yaml</code> schedules a <code>flush_history</code> shock at session 3 — the operator action that drops the conversation transcript, leaving only the compacted memory store <code>M<sub>t</sub></code>.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 1 · before the shock</div>
+              <div class="trace-bubble user">"What was the best-selling product on our e-commerce platform in 2022?"</div>
+              <div class="trace-bubble agent correct">"<strong>Quest Lumaflex Band</strong> — 4,892 units sold, $78,272 in revenue, top of the Fitness category." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 5 · after <code>flush_history</code> at session 3</div>
+              <div class="trace-bubble user">Same question.</div>
+              <div class="trace-bubble agent wrong">"Several fitness products dominated 2022; Lumaflex-branded resistance gear appeared multiple times in the top 10. I don't have the exact unit counts in my notes anymore." <span class="cross">✗ <small>(generic — no product name, no number)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Probe <code>s0_p0</code></span> · keywords = [<code>Quest Lumaflex Band</code>, <code>Lumaflex Band</code>], canonical answer = "Quest Lumaflex Band." The session-0 environment data never changed.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> At session 3, the operator triggered a <code>flush_history</code> shock — conversation transcripts are dropped, leaving only the compacted memory store. Because the SUT uses <code>lossy_growing</code> compaction, <code>M<sub>t</sub></code> was already a paragraph paraphrase: the specific token <em>Quest Lumaflex Band</em> and the number <em>4,892</em> had been folded into a generic phrase. The agent isn't retrieving wrong — the substrate lost its specifics under the maintenance event. This is aging from <em>actions on</em> the agent, not from interaction with memory.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== ABSTRACT moved earlier in the page (now sits before "Three ways in") ========== -->
+
+<!-- ========== ANALYSIS (figure-first, horizontal-scroll strip) ========== -->
+<section id="analysis" class="section bg-soft" style="padding-top:48px; padding-bottom:48px;">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:8px;">Analysis</h2>
+    <p class="section-lead" style="margin:0 0 24px;">Selected results, each anchored on a results figure — scroll the strip to browse. See our paper for detailed findings and intervention implications.</p>
+
+    <div class="analysis-strip" role="list">
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/all_scenarios.png" alt="Aging curves across all seven scenarios."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill">Overview</span>
+          <h3>Aging is real, measurable, and pervasive</h3>
+          <p>Headline metrics decline session-by-session for every (model × memory policy) combination across the seven scenarios. There is no setup that does not age.</p>
+        </div>
+      </article>
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/fig5a_heatmap_final.png" alt="S1 compression half-life heatmap across models and memory policies."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill compression">Compression</span>
+          <h3>Memory policy beats model swap</h3>
+          <p>S1 half-life heatmap: switching the compaction prompt produces a larger half-life delta than any model swap in the row. The memory layer dominates, not the model.</p>
+        </div>
+      </article>
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/gemma4_31b.png" alt="S2 silent precision-loss curve: violation rate stays at zero while precision drops."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill interference">Silent decay</span>
+          <h3>Behavioral compliance ≠ factual accuracy</h3>
+          <p>On S2, constraint violation rate stays at zero throughout deployment while constraint precision drops and lag recall collapses. Behavioral monitors miss the decay entirely.</p>
+        </div>
+      </article>
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/fig5c_revision_scatter.png" alt="S2 revision two-axis scatter across 7 models."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill revision">Revision</span>
+          <h3>Two-axis failure: scaling doesn't help</h3>
+          <p>Across 7 models on S2, accumulator error and forget accuracy do not co-improve. Larger models are not consistently better — revision is representational, not a capacity problem.</p>
+        </div>
+      </article>
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/fig5d_maintenance_bars.png" alt="S6 maintenance shock recovery shapes for flush, recompact, and early-shock variants."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill maintenance">Maintenance</span>
+          <h3>Shock type matters more than model</h3>
+          <p>On S6, flush / recompact / early-shock variants share the pre-shock window but produce distinct post-shock recovery shapes — the type of routine event matters more than the model running underneath.</p>
+        </div>
+      </article>
+
+      <article class="analysis-card" role="listitem">
+        <div class="analysis-figure">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/diagnostic_fingerprint_v3.png" alt="Aging attribution fingerprint across three models and three scenarios; W/R/U decomposition."/>
+        </div>
+        <div class="analysis-copy">
+          <span class="pill">Diagnosis</span>
+          <h3>Same symptom, opposite fixes</h3>
+          <p>Aggregate failure rates cluster (~0.60–0.82) but the Write / Retrieval / Utilization decomposition is heterogeneous: S1 is utilization-bound, S2 write-bound, S5 flips between the two. Same number, opposite interventions.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== CITATION ========== -->
+<section id="cite" class="section bg-soft">
+  <div class="container narrow">
+    <h2 class="section-title">Cite this work</h2>
+    <pre class="bibtex"><code id="bibtex-block">@inproceedings{agingbench2026,
+  title     = {Long-Lived AI Agents Age Too: They Quietly Decay After Deployment},
+  author    = {Zhu, Jianing and Ro, Yeonju and Robertson, John and Wang, Kevin and
+               Li, Junbo and Vikalo, Haris and Akella, Aditya and Wang, Zhangyang},
+  booktitle = {Preprint},
+  year      = {2026}
+}</code></pre>
+    <button class="btn copy-btn" id="copy-bibtex">Copy BibTeX</button>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <p>AgingBench · The University of Texas at Austin</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+  </div>
+</footer>
+
+<!-- Lightbox overlay (used by .zoomable images — click to enlarge, Esc / click outside to close) -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+  <button class="lightbox-close" type="button" aria-label="Close">×</button>
+  <img id="lightbox-image" src="" alt="" />
+  <p id="lightbox-caption" class="lightbox-caption"></p>
+</div>
+
+<script src="assets/js/demo.js"></script>
+<script src="assets/js/metrics.js"></script>
+<script src="assets/js/lightbox.js"></script>
+</body>
+</html>

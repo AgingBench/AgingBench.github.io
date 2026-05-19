@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telemetry · AgingBench</title>
+  <meta name="description" content="Score the agent you're already running. Telemetry mode maps any production trace into the AgingCard schema — runs entirely in your browser via Pyodide." />
+
+  <meta property="og:title" content="AgingBench Telemetry — score your traces in your browser" />
+  <meta property="og:description" content="Drop a JSONL trace from Claude Code (validated) or any JSONL with role / content / token fields. Get an AgingCard back. No upload." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;text y='52' font-size='52'&gt;⌛&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body data-page="telemetry">
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">⌛</span> AgingBench<span class="version-badge">v0.3.0</span></a>
+    <nav class="top-nav">
+      <a href="use.html">Use</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="docs.html">Docs</a>
+      <a href="telemetry.html" aria-current="page" class="nav-active">Telemetry</a>
+    </nav>
+    <div class="resource-buttons">
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
+      <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">💻 Code</span>
+      <a href="index.html#cite" class="btn">BibTeX</a>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ========== HERO ========== -->
+<section class="hero hero-tight">
+  <div class="container">
+    <p class="venue-tag">Telemetry mode · in-browser demo</p>
+    <h1 class="hero-title">Score the agent you're already running.</h1>
+    <p class="hero-tagline">Map any production trace into the same AgingCard schema — no scenario rerun, no LLM cost, runs entirely in your browser. Nothing is uploaded.</p>
+  </div>
+</section>
+
+<!-- ========== DEMO ========== -->
+<section id="demo" class="section bg-soft">
+  <div class="container">
+    <h2 class="section-title">Try it</h2>
+    <p class="section-lead">Pick a pre-bundled sample, or drop a JSONL trace of your own. Computation runs locally in Pyodide (~10 MB Python WebAssembly runtime, cached on first visit).</p>
+
+    <div class="telem-panel">
+
+      <div class="telem-step">
+        <h3>1 · Provide a trace</h3>
+        <label class="telem-upload-label">
+          <span>Drop or select a JSONL file:</span>
+          <input id="telem-upload" type="file" accept=".jsonl,application/json,text/plain"/>
+          <span class="telem-upload-name" id="telem-upload-name">no file chosen</span>
+        </label>
+        <p class="telem-hint">No trace handy? Each <a href="#recipes">recipe card below</a> has a one-click <em>Try sample</em> button. <strong>Using Claude Code already?</strong> Your session files are on disk — see the <a href="#recipes"><code>claude_code</code> recipe</a> for the one-liner that bundles them.</p>
+      </div>
+
+      <div class="telem-step">
+        <h3>2 · Format &amp; profile</h3>
+        <div class="telem-options">
+          <label>format
+            <select id="telem-format">
+              <option value="generic">generic</option>
+              <option value="claude_code">claude_code</option>
+            </select>
+            <small class="telem-dropdown-hint">Only the two v0.3.0-verified formats are exposed here. <code>claude_code</code> for native Claude Code session files; <code>generic</code> for any JSONL with <code>session_id</code> / <code>role</code> / <code>content</code> / token fields. Five more adapters parse correctly in the codebase but aren't surfaced in the demo yet — see <a href="#other-adapters">Other adapters</a> below. To use those, call <code>trace_to_card_v11(...)</code> via the <a href="#for-terminal-users">Python API</a>.</small>
+          </label>
+          <label>profile
+            <select id="telem-profile">
+              <option value="generic">generic</option>
+              <option value="code_assistant">code_assistant</option>
+            </select>
+            <small class="telem-dropdown-hint"><code>code_assistant</code> for coding-agent traces (Claude Code, Cursor, OpenHands, etc.) where probes &amp; tool calls are file-edit-heavy. <code>generic</code> for chat / RAG / support-bot traces.</small>
+          </label>
+        </div>
+        <button id="telem-compute" class="btn-cta">▶ Compute AgingCard</button>
+      </div>
+
+      <p id="telem-status" class="telem-status">Loading analysis engine…</p>
+      <p class="telem-status-hint">First visit takes ~5–15 s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
+    </div>
+
+    <!-- Result panel (hidden until compute) -->
+    <div id="telem-result" class="telem-result" hidden>
+      <div id="telem-meta-pills" class="telem-meta-pills"></div>
+
+      <h3>Headline <span class="muted" style="font-weight:400;font-size:0.85em;">(hover any cell for what it means)</span></h3>
+      <div class="telem-headline-grid">
+        <div title="Headline score at the LAST session in the trace. 1.0 = no measurable degradation; 0 = total collapse.">
+          <span>m_final</span>     <strong data-headline-field="m_final"></strong>
+          <small class="telem-metric-hint">score at last session (1=perfect, 0=collapsed)</small>
+        </div>
+        <div title="Number of sessions for the score to fall to 50% of its starting value (m0). ∞ means it never reached that threshold in this trace.">
+          <span>half_life</span>   <strong data-headline-field="half_life"></strong>
+          <small class="telem-metric-hint">sessions to drop to 50% (∞ = never)</small>
+        </div>
+        <div title="Per-session linear slope. -0.05 ≈ losing 5% per session; positive means the agent improved over the trace (rare).">
+          <span>decay_slope</span> <strong data-headline-field="decay_slope"></strong>
+          <small class="telem-metric-hint">per-session change (− means aging)</small>
+        </div>
+        <div title="Boolean. True when decay_slope &lt; -0.01 OR (m0 − m_final)/m0 ≥ 0.10. Set by aging_card.py heuristic.">
+          <span>aging detected</span><strong data-headline-field="aging_detected"></strong>
+          <small class="telem-metric-hint">slope &lt; −0.01 or ≥10% drop</small>
+        </div>
+      </div>
+
+      <h3>Per-mechanism trajectories</h3>
+      <div id="telem-mech-grid" class="telem-mech-grid"></div>
+
+      <h3>Cost &amp; efficiency</h3>
+      <div id="telem-cost-block" class="telem-cost-block"></div>
+
+      <!-- Merged-probe display (hidden until a probe card is dropped) -->
+      <div id="telem-probes" class="telem-probes" hidden>
+        <h3>Synthetic probe results <span class="muted">(merged into <code>synthetic_probes</code>)</span></h3>
+        <div id="telem-probes-grid" class="telem-probes-grid"></div>
+      </div>
+
+      <!-- Boost a thin trace: synthetic-probe augmentation -->
+      <aside id="telem-augment" class="telem-augment" hidden>
+        <h3>Thin trace? Boost with a synthetic probe</h3>
+        <p id="telem-augment-reason" class="telem-augment-reason"></p>
+        <p>Your trace doesn't carry enough sessions or fired tests for a confident aging verdict. Run one AgingBench scenario as a probe against your live agent, then drop the resulting card here. The probe's headline + per-mechanism curve will appear alongside your telemetry numbers (in a new <code>synthetic_probes</code> block), so you see observational signal and controlled signal side by side without one overwriting the other.</p>
+        <ol class="telem-augment-steps">
+          <li>
+            <strong>Install + run a probe</strong> (~$0.50–2 in API credit, 5–15 min wall on a Haiku-class model — depends on probes and retries). Pick a scenario from the injectable set: <code>s1_research_literature</code>, <code>s2_lifestyle_assistant</code>, <code>s3_knowledge_base</code>, <code>s4_software_engineering</code>, <code>s6_naturalistic</code>. Default SUT is the same Haiku-4.5 / lossy-compress one the Lite suite uses; swap for your own SUT YAML if you want the probe to run against <em>your</em> agent.
+            <pre class="recipe-cmd">pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+export ANTHROPIC_API_KEY=sk-ant-...
+agingbench run \
+  --scenario s2_lifestyle_assistant \
+  --sut agingbench/registry/suts/haiku45/haiku45_lossy_compress.yaml \
+  --sessions 8 --seeds 1 --card \
+  --output ./probe_out</pre>
+          </li>
+          <li>
+            <strong>Drop the probe card</strong> (<code>probe_out/aging_card.json</code>) below. Merging runs in your browser — no upload.
+            <label class="telem-upload-label">
+              <span>Probe AgingCard JSON:</span>
+              <input id="telem-probe-upload" type="file" accept=".json,application/json" />
+              <span class="telem-upload-name" id="telem-probe-upload-name">no file chosen</span>
+            </label>
+            <button id="telem-probe-merge" class="btn-cta" disabled>▶ Merge probe into card</button>
+          </li>
+        </ol>
+        <p class="muted-line">The merged card carries a new <code>synthetic_probes</code> block with the probe's headline + per-mechanism metrics tagged <code>derived_from: synthetic_probe</code>. Your observational signals stay where they are; the probe adds controlled signal alongside.</p>
+      </aside>
+
+      <div class="telem-actions">
+        <button id="telem-download" class="btn-cta">Download AgingCard JSON</button>
+      </div>
+
+      <details class="telem-raw">
+        <summary>Show full AgingCard JSON</summary>
+        <pre id="telem-raw-json"></pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SUPPORTED FORMATS · 60-SECOND RECIPES ========== -->
+<section id="recipes" class="section">
+  <div class="container">
+    <h2 class="section-title">Get your trace in 60 seconds</h2>
+    <p class="section-lead">Two paths are validated for v0.3.0: the native <code>claude_code</code> session files, and the generic JSONL shape (any custom format you can reshape into <code>session_id</code> + <code>role</code> + <code>content</code> + token fields). Five more adapters ship in the codebase — they parse correctly against our fixture tests, but the extraction recipes haven't been validated against current third-party SDKs. <a href="#other-adapters">See the list below.</a></p>
+
+    <div class="recipe-grid">
+
+      <article class="recipe-card">
+        <header>
+          <h3>claude_code</h3>
+          <span class="friction-badge friction-low">drop-in · verified</span>
+        </header>
+        <p class="recipe-what">Files Claude Code already writes — no export step. Each <code>.jsonl</code> = one session; concatenate several so aging signal can be computed.</p>
+        <pre class="recipe-cmd"># macOS / Linux — bundle your 10 most recent sessions:
+ls -t ~/.claude/projects/*/*.jsonl | head -10 | xargs cat &gt; /tmp/cc_combined.jsonl
+
+# Windows (PowerShell):
+Get-ChildItem $env:USERPROFILE\.claude\projects\*\*.jsonl |
+  Sort LastWriteTime -Desc | Select -First 10 |
+  Get-Content | Set-Content $env:TEMP\cc_combined.jsonl
+
+# Then drop the combined file into Step 1 and pick format=claude_code.</pre>
+        <p class="recipe-privacy">Contains: your prompts, agent replies, tool calls, token counts. PII patterns (emails, API keys, IPs) are auto-redacted before metric inference. <strong>Aging signal needs ≥3 sessions</strong> — picking a single <code>.jsonl</code> will trip the <code>coverage: underpowered</code> warning.</p>
+        <button data-sample="claude_code" class="recipe-try">▶ Try sample (~4 sessions, all 4 mechanisms fire)</button>
+      </article>
+
+      <article class="recipe-card">
+        <header>
+          <h3>generic</h3>
+          <span class="friction-badge friction-high">bring-your-own JSONL</span>
+        </header>
+        <p class="recipe-what">Any JSONL with <code>session_id</code>, <code>role</code>, <code>content</code>, and token counts. The adapter aliases camelCase + snake_case field names.</p>
+        <pre class="recipe-cmd">{"session_id":"abc","role":"user","content":"hi",
+ "input_tokens":42,"output_tokens":0,"timestamp":"2026-05-16T10:00:00Z"}
+{"session_id":"abc","role":"assistant","content":"hello!",
+ "input_tokens":0,"output_tokens":12,"timestamp":"2026-05-16T10:00:01Z"}</pre>
+        <p class="recipe-privacy">Bring whatever shape you have — best-effort field aliasing. Pick <code>format=generic</code> in the dropdown above.</p>
+      </article>
+
+    </div>
+
+    <p class="muted-line" style="margin-top:18px;">
+      <strong>How much trace do you need?</strong> ≥3 sessions of ≥1 agent turn each is the floor for meaningful aging signal — below that the demo will flag <code>coverage: underpowered</code> and offer to <a href="#demo">augment with a synthetic probe</a>.
+      <strong>Privacy:</strong> all parsing happens in your browser via Pyodide. The trace never leaves your machine. The privacy scrubber redacts PII patterns (emails, SSN, card numbers, API keys, phone, IP) from prompt/response previews before inference; it does NOT scrub semantic content — review your trace if it contains proprietary prompts.
+    </p>
+
+    <div id="other-adapters" class="other-adapters">
+      <h3 class="subsection">Other adapters (parse-tested, recipe pending)</h3>
+      <p>Five additional format adapters ship in <code>agingbench/telemetry/adapters/</code> and pass our fixture tests against bundled sample data. The <em>extraction recipe</em> for each — i.e. the literal command to dump a JSONL from your live deployment — depends on third-party SDK versions and hasn't been validated end-to-end in v0.3.0. If you already have a JSONL of the matching shape, drop it in Step 1 and pick the format from the dropdown — the parser handles it.</p>
+      <ul class="other-adapters-list">
+        <li><strong><code>openai_assistants</code></strong> — Mixed <code>thread.message</code> / <code>thread.run</code> / <code>thread.run.step</code> objects. Recipe pending validation against OpenAI SDK 1.x; the exact field-shape from <code>model_dump()</code> may vary by SDK version.</li>
+        <li><strong><code>openhands</code></strong> — OpenHands SDK event log (<code>source</code>, <code>action</code>, <code>observation</code>, <code>llm_metrics</code>). Recipe assumes a session path that varies by install method.</li>
+        <li><strong><code>langfuse</code></strong> — Langfuse <code>GENERATION</code> spans (camelCase + snake_case both accepted). REST endpoint + filter syntax may drift across Langfuse releases.</li>
+        <li><strong><code>langsmith</code></strong> — Routes through <code>generic</code>; you reshape LangSmith run JSON into the generic field tuple.</li>
+        <li><strong><code>otlp</code></strong> — OpenTelemetry JSON spans (<code>gen_ai.*</code> and legacy <code>llm.*</code> namespaces). Exporter-specific (Phoenix, Honeycomb, Jaeger, <code>otel-cli</code>) — your wrapping may differ.</li>
+      </ul>
+      <p class="muted-line">Adapter source + per-format input contract in <code>agingbench/telemetry/adapters/</code>. Promote one of these to the validated set by contributing a tested recipe against a live source — see <a href="docs.html#contribute">Contribute</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TERMINAL ONE-LINER ========== -->
+<section id="for-terminal-users" class="section bg-soft">
+  <div class="container narrow">
+    <h2 class="section-title">For terminal users</h2>
+    <p>The same pipeline is callable from your shell — no browser required. The fastest path is a one-liner:</p>
+    <pre class="code-block"><code>pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+python -c "from agingbench.telemetry import trace_to_card_v11 as f; \
+import json; r = f(trace_jsonl='trace.jsonl', trace_format='claude_code', profile='code_assistant'); \
+print(json.dumps(r.card['headline'], indent=2))"</code></pre>
+    <p>Telemetry mode is the one path that needs <em>no</em> API key — it parses your trace locally and infers per-mechanism aging signals statistically. Or, for a fuller workflow (dumps both the headline and the per-mechanism <code>trace_audit</code> block):</p>
+    <pre class="code-block"><code>pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
+
+from agingbench.telemetry import trace_to_card_v11
+
+result = trace_to_card_v11(
+    trace_jsonl="path/to/your_trace.jsonl",
+    trace_format="claude_code",          # or: openai_assistants, openhands, langfuse, langsmith, otlp, generic
+    profile="code_assistant",            # or: generic
+    extract_outcomes=["claude_session_flags", "record_patterns"],
+)
+print(result.card["headline"])
+print(result.card["trace_audit"])</code></pre>
+    <p class="muted-line">A first-class <code>agingbench telemetry</code> CLI subcommand wrapping the above lands in v1.1. See <a href="docs.html#telemetry">the telemetry reference in the docs</a> for the format/profile/extractor catalogue and the <a href="docs.html#schema">AgingCard schema reference</a> for the full output shape.</p>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section class="section">
+  <div class="container narrow">
+    <h2 class="section-title">How it works</h2>
+    <p>Telemetry mode is the inverse of scenario mode. Instead of running constructed probes against your model, it parses a JSONL trace that your deployed agent already produced and infers per-mechanism aging signals statistically:</p>
+    <ul>
+      <li><strong>Compression</strong> — context-saturation rate, self-contradiction across sessions, fact-density slope, context-noise ratio trajectory</li>
+      <li><strong>Interference</strong> — tool-call distribution KL drift over sessions, goal-anchor drift trajectory</li>
+      <li><strong>Revision</strong> — user-correction repetition rate, stale-value citation rate, per-session violation trajectory</li>
+      <li><strong>Maintenance</strong> — model-swap / context-reset shock detection, pre/post deltas, intervention-rate trajectory</li>
+    </ul>
+    <p>Every block carries a <code>coverage.verdict</code> field (<code>strong / adequate / weak / underpowered / no_test_fired</code>) so a low score can't be confused with "agent didn't age." Trajectories also ship with a saturation-aware verdict (<code>rising_degradation</code>, <code>floor_healthy</code>, etc.) — see <a href="docs.html#telemetry">the telemetry reference</a> for the full verdict glossary, and <code>agingbench/telemetry/inference/</code> in the repo for the per-mechanism math.</p>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <p>AgingBench · The University of Texas at Austin</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+  </div>
+</footer>
+
+<script src="assets/js/telemetry_demo.js"></script>
+</body>
+</html>
