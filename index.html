@@ -141,59 +141,74 @@
            alt="Fresh deployment → aged agent: input/output stays the same, but memory clutters, signals fade, and the loop closes on itself."/>
       <figcaption>Fresh deployment vs. aged agent — same model, same input/output surface. After enough sessions, the memory store clutters, signals fade, and the agent starts looping on itself. (Click to enlarge.)</figcaption>
     </figure>
+    <br>
+    <br>
+
+  <div class="ale-questions" style="background: var(--bg); border: 1px solid var(--accent-soft); border-radius: 22px; padding: 2rem 2.2rem 1.6rem; margin: 0 auto; position: relative; box-shadow: 0 10px 30px rgba(181, 74, 43, 0.06);">
+    <span style="position: absolute; top: -12px; left: 22px; background: linear-gradient(120deg, var(--accent), #f4a261); color: #fff; padding: 0.25rem 0.85rem; border-radius: 999px; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.16em; box-shadow: 0 3px 10px rgba(181, 74, 43, 0.20);">Agent lifespan engineering (ALE)</span>
+    <p style="margin: 0 0 0.9rem; font-weight: 600; color: var(--ink); font-size: 16px;">Three key questions:</p>
+    <ol style="margin: 0; padding-left: 1.3rem; color: var(--ink); line-height: 1.75; font-size: 15.5px;">
+      <li><em>How long</em> does a deployed agent remain reliable?</li>
+      <li><em>How</em> does reliability decay: through <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, or <span class="highlight-pill maintenance">maintenance</span>?</li>
+      <li><em>Where</em> should repair target: <em>writing</em>, <em>retrieval</em>, <em>utilization</em>, or the memory <em>lifecycle</em>?</li>
+    </ol>
+  </div>
+
   </div>
 </section>
 
-<!-- ========== FOUR MECHANISMS (compressed) ========== -->
-<section id="mechanisms" class="section">
+
+
+
+<!-- ========== Q1: HOW LONG — Day 1 → Day N decay ========== -->
+<section id="decay" class="section">
   <div class="container">
-    <h2 class="section-title">The four aging mechanisms</h2>
-    <p class="section-lead" style="margin:0 0 24px;">Each mechanism is a distinct causal route to degradation. They can co-occur, but they are <em>conceptually orthogonal</em>: an intervention that fixes one need not touch the others. <a href="docs.html">Read the deep version →</a></p>
+    <h2 class="section-title">① How long remain reliable? Day 1 → Day N</h2>
+    <p class="section-lead" style="margin:0 0 24px;">Across scenarios, models, and memory policies, agents that pass day-one evaluation often show longitudinal degradation across sessions. See more <a href="leaderboard.html">results in our evaluation →</a></p>
 
     <figure class="evidence-figure">
       <img class="zoomable" data-zoomable src="assets/img/figure1_draft.png"
            alt="Day 1 vs Day N for the four mechanisms — chat-bubble examples plus declining recall/precision curves across sessions."/>
-      <figcaption>Day 1 → Day N across the four mechanisms. Chat-bubble examples (left) show how each failure mode reads to a user (omission, confusion, staleness, collapse). Curves (centre) show recall/precision declining across sessions for representative models on each mechanism. (Click to enlarge.)</figcaption>
+      <figcaption>Day 1 → Day N across the four mechanisms. Chat-bubble examples (left) show how each failure mode tends to read to a user (omission, confusion, staleness, collapse). Curves (centre) show recall/precision declining across sessions for representative models on each mechanism. (Click to enlarge.)</figcaption>
     </figure>
-
-    <div class="mech-grid">
-      <article class="mech-card mech-compression">
-        <div class="mech-num">①</div>
-        <h3>Compression</h3>
-        <p>Write-time abstraction destroys information <em>before</em> future queries are known. Low-frequency details (numbers, names, constraint values) are discarded; high-level summaries survive. The system "remembers what it was about" but loses what it actually said.</p>
-      </article>
-      <article class="mech-card mech-interference">
-        <div class="mech-num">②</div>
-        <h3>Interference</h3>
-        <p>Even when no information is lost and nothing has changed, growing state buries the relevant fact behind similar entries during retrieval. Orthogonal to revision: freezing all facts does not prevent it.</p>
-      </article>
-      <article class="mech-card mech-revision">
-        <div class="mech-num">③</div>
-        <h3>Revision</h3>
-        <p>The agent fails to track changing truth. Especially severe for <em>dynamic latent state</em> (a budget, a counter, a configuration) where the answer is derived from accumulated updates. A single missed update silently contaminates every subsequent query.</p>
-      </article>
-      <article class="mech-card mech-maintenance">
-        <div class="mech-num">④</div>
-        <h3>Maintenance</h3>
-        <p>Routine operational events (recompaction, prompt updates, log cleanup, model swaps) silently alter behavior. Driven by actions <em>on</em> the agent, not by its interaction with memory. Causes performance cliffs invisible to standard evaluation.</p>
-      </article>
-    </div>
   </div>
 </section>
 
 
-<!-- ========== DEMO ========== -->
-<section id="demo" class="section">
+<!-- ========== Q2: HOW — Four aging mechanisms + Watch an agent age ========== -->
+<section id="mechanisms" class="section">
   <div class="container">
-    <h2 class="section-title">Watch an agent age</h2>
-    <p class="section-lead" style="margin:0 0 24px;">Frozen weights, growing memory. Each tab walks one agent through a real AgingBench scenario and shows how the same query degrades across sessions, for different reasons. Vignettes are drawn from the actual scenario configs in the benchmark repository.</p>
+    <h2 class="section-title">② How does reliablity decay? Four aging mechanisms</h2>
+    <p class="section-lead" style="margin:0 0 24px;">Decay is rarely a single phenomenon. AgingBench organises the observed failure patterns into four mechanisms, each pointing to a different way reliability can erode. <a href="docs.html">Read the deep version →</a></p>
+
+    <div class="mech-grid">
+      <article class="mech-card mech-compression">
+        <h3>Compression</h3>
+        <p>Write-time abstraction destroys information <em>before</em> future queries are known. Low-frequency details (numbers, names, constraint values) are discarded; high-level summaries survive. The system "remembers what it was about" but loses what it actually said.</p>
+      </article>
+      <article class="mech-card mech-interference">
+        <h3>Interference</h3>
+        <p>Even when no information is lost and nothing has changed, growing state buries the relevant fact behind similar entries during retrieval. Orthogonal to revision: freezing all facts does not prevent it.</p>
+      </article>
+      <article class="mech-card mech-revision">
+        <h3>Revision</h3>
+        <p>The agent fails to track changing truth. Especially severe for <em>dynamic latent state</em> (a budget, a counter, a configuration) where the answer is derived from accumulated updates. A single missed update silently contaminates every subsequent query.</p>
+      </article>
+      <article class="mech-card mech-maintenance">
+        <h3>Maintenance</h3>
+        <p>Routine operational events (recompaction, prompt updates, log cleanup, model swaps) silently alter behavior. Driven by actions <em>on</em> the agent, not by its interaction with memory. Causes performance cliffs invisible to standard evaluation.</p>
+      </article>
+    </div>
+
+    <h3 id="demo" class="subsection" style="margin-top: 56px; font-family: var(--serif); font-size: 26px; letter-spacing: -0.01em;">Watch an agent age</h3>
+    <p class="section-lead" style="margin:0 0 24px;">Frozen weights, growing memory. Each tab walks one agent through a real AgingBench scenario and shows how the same query tends to degrade across sessions, for different reasons. Vignettes are drawn from the actual scenario configs in the benchmark repository.</p>
 
     <div class="demo-widget">
       <div class="demo-tabs" role="tablist">
-        <button class="demo-tab active" data-tab="compression" role="tab">① Compression</button>
-        <button class="demo-tab" data-tab="interference" role="tab">② Interference</button>
-        <button class="demo-tab" data-tab="revision" role="tab">③ Revision</button>
-        <button class="demo-tab" data-tab="maintenance" role="tab">④ Maintenance</button>
+        <button class="demo-tab active" data-tab="compression" role="tab">Compression</button>
+        <button class="demo-tab" data-tab="interference" role="tab">Interference</button>
+        <button class="demo-tab" data-tab="revision" role="tab">Revision</button>
+        <button class="demo-tab" data-tab="maintenance" role="tab">Maintenance</button>
       </div>
 
       <div class="demo-panel active" data-panel="compression">
@@ -312,6 +327,38 @@
   </div>
 </section>
 
+
+<!-- ========== Q3: WHERE — Component-level failure diagnosis ========== -->
+<section id="diagnosis" class="section">
+  <div class="container">
+    <h2 class="section-title">③ Where should repair target? Component-level diagnosis</h2>
+    <p class="section-lead" style="margin:0 0 32px;">Knowing <em>how long</em> and <em>how</em> a system tends to decay is not yet enough to act on. The third ALE question asks <em>where</em> in the memory pipeline a failure is consistent with — the candidate repair site. AgingBench instruments the four pipeline components (<strong>𝒲</strong> write, <strong>𝒮</strong> store, <strong>ℛ</strong> retrieve, <strong>𝒰</strong> utilize) and uses paired counterfactual probes that swap each component with an oracle to surface a stage-level diagnostic signature.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 36px; align-items: start;">
+      <div>
+        <h3 class="subsection" style="margin: 0 0 12px; font-family: var(--serif); font-size: 22px; letter-spacing: -0.01em;">Memory pipeline</h3>
+        <p style="margin: 0 0 16px; color: var(--ink); font-size: 14.5px; line-height: 1.6;">Four candidate repair sites — 𝒲 (write/compression), 𝒮 (store), ℛ (retrieve), 𝒰 (utilize). Counterfactual probes swap each with an oracle to localise where a failure is consistent with.</p>
+        <figure class="intuition-figure" style="margin: 0;">
+          <img class="zoomable" data-zoomable src="assets/img/dataflow.png"
+               alt="Memory pipeline dataflow with the four attribution components: Write (𝒲), Store (𝒮), Retrieve (ℛ), Utilize (𝒰)."/>
+          <figcaption>Memory pipeline (paper Fig. 2). Data flows sequentially: History → 𝒲 → 𝒮 → ℛ → Context → 𝒰 → Answer. Each stage is a candidate site where the same end-to-end failure can originate. <a href="docs.html#diagnose">Counterfactual diagnosis →</a></figcaption>
+        </figure>
+      </div>
+
+      <div>
+        <h3 class="subsection" style="margin: 0 0 12px; font-family: var(--serif); font-size: 22px; letter-spacing: -0.01em;">Same wrong answer, incompatible repairs</h3>
+        <p style="margin: 0 0 16px; color: var(--ink); font-size: 14.5px; line-height: 1.6;">Aggregate failure rates can look nearly identical across scenarios while the underlying stage-level signatures differ. Two systems with the same accuracy can point to different repair targets.</p>
+        <figure class="intuition-figure" style="margin: 0;">
+          <img class="zoomable" data-zoomable src="assets/img/analysis/diagnostic_fingerprint_v3.png"
+               alt="Aging attribution fingerprint across three models and three scenarios; Write/Retrieval/Utilization decomposition."/>
+          <figcaption>Stage-level diagnostic fingerprints across three models on three scenarios. Aggregate failure rates cluster (~0.60–0.82), but the Write / Retrieval / Utilization shares vary: S1 is consistent with a utilization-dominant signature, S2 with a write-dominant one, S5 flips between them.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <!-- ========== ABSTRACT moved earlier in the page (now sits before "Three ways in") ========== -->
 
 <!-- ========== ANALYSIS (figure-first, horizontal-scroll strip) ========== -->
@@ -374,17 +421,6 @@
           <span class="pill maintenance">Maintenance</span>
           <h3>Shock type matters more than model</h3>
           <p>On S6, flush / recompact / early-shock variants share the pre-shock window but produce distinct post-shock recovery shapes — the type of routine event matters more than the model running underneath.</p>
-        </div>
-      </article>
-
-      <article class="analysis-card" role="listitem">
-        <div class="analysis-figure">
-          <img class="zoomable" data-zoomable src="assets/img/analysis/diagnostic_fingerprint_v3.png" alt="Aging attribution fingerprint across three models and three scenarios; W/R/U decomposition."/>
-        </div>
-        <div class="analysis-copy">
-          <span class="pill">Diagnosis</span>
-          <h3>Same wrong answer, incompatible repairs</h3>
-          <p>Aggregate failure rates cluster (~0.60–0.82) but the Write / Retrieval / Utilization decomposition is heterogeneous: S1 is utilization-bound, S2 write-bound, S5 flips between the two. Same number, incompatible repairs.</p>
         </div>
       </article>
 

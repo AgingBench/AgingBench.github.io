@@ -43,7 +43,7 @@
   <div class="container">
     <p class="venue-tag">Reference &amp; methodology</p>
     <h1 class="hero-title">Docs</h1>
-    <p class="hero-tagline">Seven scenarios in detail, the temporal-DAG methodology, the counterfactual diagnosis story, the AgingCard schema, contribution guide, and maintenance pledge.</p>
+    <p class="hero-tagline">Seven scenarios in detail, the temporal-DAG measurement and counterfactual diagnosis tools for agent lifespan engineering (ALE), the AgingCard schema, contribution guide, and maintenance pledge.</p>
   </div>
 </section>
 
@@ -58,7 +58,8 @@
       <a href="#telemetry" data-spy="telemetry">Telemetry reference</a>
       <a href="#schema" data-spy="schema">AgingCard schema</a>
       <a href="#samples" data-spy="samples">Sample cards</a>
-      <a href="#harbor" data-spy="harbor">Harbor integration <em>(planned)</em></a>
+      <!-- TEMP: Harbor integration hidden until follow-up release -->
+      <!-- <a href="#harbor" data-spy="harbor">Harbor integration <em>(planned)</em></a> -->
       <a href="#contribute" data-spy="contribute">Contribute</a>
       <a href="#pledge" data-spy="pledge">Maintenance pledge</a>
     </nav>
@@ -69,8 +70,8 @@
 <!-- ========== SCENARIOS CATALOG ========== -->
 <section id="scenarios" class="section">
   <div class="container">
-    <h2 class="section-title">Eight deployment scenarios</h2>
-    <p class="section-lead">Each scenario mirrors a real product surface and naturally activates a subset of mechanisms. Tier 1 (S1–S6) is runner-controlled: the harness owns the session loop, and you swap models, memory policies, components, or controllers. Tier 2 (S7, S8) is agent-controlled: the agent owns the loop.</p>
+    <h2 class="section-title">Seven deployment scenarios <span class="muted-line" style="font-size:0.55em; font-weight:400; letter-spacing:0;">+ SWE-bench-Aging extension</span></h2>
+    <p class="section-lead">Each scenario mirrors a real product surface and naturally activates a subset of mechanisms. Tier 1 (S1–S6) is runner-controlled: the harness owns the session loop, and you swap models, memory policies, components, or controllers. Tier 2 (S7) is agent-controlled: the agent owns the loop. <strong>S8</strong> ships alongside the seven canonical scenarios as a SWE-bench-Aging extension probing a Django issue chain under per-session Docker reset.</p>
 
     <article class="scenario-detail">
       <div class="scen-id">S1</div><span class="scen-tier">Tier 1</span>
@@ -220,14 +221,14 @@
     </figure>
 
     <h3 class="subsection">Three counterfactual probes</h3>
-    <p>Each probe replaces selected upstream components with oracle implementations; the remaining accuracy gap identifies the first non-oracle component that can still explain the failure. The probes form an ablation ladder over the pipeline:</p>
+    <p>Each probe replaces selected upstream components with oracle implementations; the resulting accuracy gaps <strong>point to the first non-oracle component that is consistent with the failure</strong>. The probes form an ablation ladder over the pipeline:</p>
 
     <div class="attr-flow">
       <div class="attr-step"><div class="attr-num">1</div><h4>P<sub>1</sub></h4><p>Baseline execution. Agent uses its own write, retrieval, and utilisation logic. Measures <code>Acc<sub>P1</sub></code>.</p></div>
       <div class="attr-arrow" aria-hidden="true"></div>
       <div class="attr-step"><div class="attr-num">2</div><h4>P<sub>2</sub></h4><p>Oracle retrieval. Bypass ℛ — oracle extracts required facts from the agent's actual store and injects them into the prompt. Measures <code>Acc<sub>P2</sub></code>.</p></div>
       <div class="attr-arrow" aria-hidden="true"></div>
-      <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error is utilisation.</p></div>
+      <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error points to utilisation.</p></div>
     </div>
 
     <table class="cost-table" style="margin-top:18px; max-width:560px;">
@@ -241,19 +242,19 @@
       </tbody>
     </table>
 
-    <h3 class="subsection">Error partition</h3>
-    <p>From the three probe accuracies, total error decomposes into three mutually exclusive components, each mapped to one execution-loop aging mechanism:</p>
+    <h3 class="subsection">Stage-level diagnostic signatures</h3>
+    <p>Within this conceptual pipeline decomposition, the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> ladder <strong>additively accounts for</strong> the end-to-end error across the Write, Retrieval, and Utilization stages, yielding a <strong>stage-level diagnostic signature</strong> rather than a unique causal decomposition for every architecture. The three shares are read as <em>candidate failure stages</em>:</p>
     <ul>
-      <li><strong>Utilisation Error</strong> = <code>1 − Acc<sub>P3</sub></code> → <span class="highlight-pill revision">Revision aging</span> (𝒰). LLM fails despite a perfect context.</li>
-      <li><strong>Write Error</strong> = <code>Acc<sub>P3</sub> − Acc<sub>P2</sub></code> → <span class="highlight-pill compression">Compression aging</span> (𝒲). Facts physically missing from the store — destroyed by the compaction policy at write time.</li>
-      <li><strong>Read Error</strong> = <code>Acc<sub>P2</sub> − Acc<sub>P1</sub></code> → <span class="highlight-pill interference">Interference aging</span> (ℛ). Facts present in the store but the retrieval algorithm failed to fetch them.</li>
+      <li><strong>Utilisation share</strong> = <code>1 − Acc<sub>P3</sub></code> → consistent with a <span class="highlight-pill revision">revision-aging signature</span> (𝒰): the model fails despite a perfect context.</li>
+      <li><strong>Write share</strong> = <code>Acc<sub>P3</sub> − Acc<sub>P2</sub></code> → pointing to a <span class="highlight-pill compression">compression-aging signature</span> (𝒲): information was already underspecified at write time.</li>
+      <li><strong>Read share</strong> = <code>Acc<sub>P2</sub> − Acc<sub>P1</sub></code> → consistent with an <span class="highlight-pill interference">interference-aging signature</span> (ℛ): facts in the store but retrieval failed to fetch them.</li>
     </ul>
 
-    <p><strong>Maintenance aging</strong> (𝒮) is observationally aliased with Write Error — both result in missing facts in the store. AgingBench separates them <em>temporally</em>: execution-loop errors are probed across sessions, while maintenance shocks are measured immediately across a lifecycle event at time <em>t</em>:</p>
-    <p style="text-align:center; font-family:var(--mono); margin: 8px 0 14px;"><code>Δ𝒮 = WriteError(t⁺) − WriteError(t⁻)</code></p>
-    <p>A discrete jump in Write Error coincident with a lifecycle event isolates maintenance aging from gradual write degradation.</p>
+    <p><strong>Maintenance aging</strong> (𝒮) is observationally aliased with the Write share — both result in missing facts in the store. AgingBench separates them <em>temporally</em>: execution-loop signatures are probed across sessions, while maintenance shocks are measured immediately across a lifecycle event at time <em>t</em>:</p>
+    <p style="text-align:center; font-family:var(--mono); margin: 8px 0 14px;"><code>Δ𝒮 = WriteShare(t⁺) − WriteShare(t⁻)</code></p>
+    <p>A discrete jump in the Write share coincident with a lifecycle event separates maintenance aging from gradual write degradation.</p>
 
-    <p class="muted-line">Implementation: <code>agingbench/diagnostics/partitioner.py</code> computes the per-session <code>DiagnosticResult</code> with all three error components; <code>agingbench/runner/diagnostic_mixin.py</code> drives the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> probe execution. The partition is emitted to the <a href="#schema">AgingCard</a> under <code>mechanism_metrics</code>. Enable diagnostic probes with <code>--diagnose</code> on any <code>agingbench run</code> invocation.</p>
+    <p class="muted-line">Implementation: <code>agingbench/diagnostics/partitioner.py</code> computes the per-session <code>DiagnosticResult</code> with all three stage shares; <code>agingbench/runner/diagnostic_mixin.py</code> drives the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> probe execution. The signatures are emitted to the <a href="#schema">AgingCard</a> under <code>mechanism_metrics</code>. Enable diagnostic probes with <code>--diagnose</code> on any <code>agingbench run</code> invocation.</p>
 
     <h3 class="subsection">Aging as a runtime control problem</h3>
     <p>A long-lived agent is constantly making control decisions: what to write, what to compress, what to retrieve, when to recompact, when to flush, when to promote something into structured state. AgingBench is positioned not only as a measurement benchmark but as a <strong>testbed for runtime memory control policies</strong>. Controllers observe per-session signals (lag-recall, ws_fidelity, accumulator error, post-shock delta, token cost, latency) and choose interventions (append, compress, retrieve, recompact, flush, force-read, promote to typed state). The <code>ThresholdController</code> class in <code>core/controller.py</code> ships in v0.3.0; full CLI pluggability and reference controllers land in v1.1 (Track D).</p>
@@ -393,7 +394,8 @@ r = trace_to_card_v11(
   </div>
 </section>
 
-<!-- ========== HARBOR INTEGRATION ========== -->
+<!-- ========== HARBOR INTEGRATION (TEMP: hidden via <template>, restore by removing the <template> wrapper) ========== -->
+<template id="harbor-section-disabled">
 <section id="harbor" class="section">
   <div class="container">
     <h2 class="section-title">Planned Harbor integration</h2>
@@ -488,6 +490,8 @@ harbor run -d agingbench@v0.3 -a claude-code --env modal   -n 64</code></div>
     <p class="muted-line" style="margin-top: 18px;">Harbor docs: <a href="https://www.harborframework.com/" rel="external">harborframework.com</a> · Source: <a href="https://github.com/harbor-framework/harbor" rel="external">harbor-framework/harbor</a></p>
   </div>
 </section>
+</template>
+<!-- ========== END HARBOR INTEGRATION (TEMP) ========== -->
 
 <!-- ========== CONTRIBUTE ========== -->
 <section id="contribute" class="section">
