@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AgingBench: AI Agents Age Too</title>
-  <meta name="description" content="A longitudinal reliability benchmark that isolates four aging mechanisms in memory-enabled AI agents, with component-aware diagnosis of where failure originates." />
+  <meta name="description" content="A longitudinal reliability benchmark foundation for agent lifespan engineering" />
 
   <!-- Open Graph / Twitter card -->
   <meta property="og:title" content="AgingBench: AI Agents Age Too" />
-  <meta property="og:description" content="A longitudinal reliability benchmark that isolates four aging mechanisms in memory-enabled AI agents." />
+  <meta property="og:description" content="A longitudinal reliability benchmark foundation for agent lifespan engineering." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/img/figure1_draft.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -91,7 +91,7 @@
       </div>
     </div>
   </div>
-  <p>
+  <p></p>
 </section>
 
 <!-- ========== ABSTRACT (recursivemas-style, .abstract-box with TL;DR badge) ========== -->
@@ -102,7 +102,7 @@
     </div>
     <div class="abstract-box">
       <p>Long-lived AI agents are increasingly deployed as persistent operational systems, yet they are still evaluated like freshly initialized models. Day-one benchmarks miss a basic systems question: <i>how long does an agent remain reliable after deployment</i>? Even when model weights are frozen, an agent's effective state keeps changing as it compresses interaction history, retrieves from a growing memory store, revises facts after updates, and undergoes routine maintenance. Reliability therefore becomes a lifespan property of the full agent harness, not only a snapshot property of the base model.</p> 
-      <p>We introduce <strong>AgingBench</strong>, a longitudinal reliability benchmark for <b>agent lifespan engineering</b>: measuring not only whether deployed agents degrade, but what form the degradation takes and where repair should target. AgingBench organizes agent <i>aging</i> into four mechanisms: <span class="highlight-pill compression">compression aging</span>, where write-time summarization drops future-relevant details; <span class="highlight-pill interference">interference aging</span>, where accumulated similar memories crowd out the target fact; <span class="highlight-pill revision">revision aging</span>, where changed or derived state is not updated correctly; and <span class="highlight-pill maintenance">maintenance aging</span>, where lifecycle events such as flushing or recompaction trigger regressions. To diagnose these failures, we uses temporal dependency graphs and paired counterfactual probes that produce diagnostic signatures for the write, retrieval, and utilization stages of the memory pipeline.</p>
+      <p>We introduce <strong>AgingBench</strong>, a longitudinal reliability benchmark for <b>agent lifespan engineering</b>: measuring not only whether deployed agents degrade, but what form the degradation takes and where repair should target. AgingBench organizes agent <i>aging</i> into four mechanisms: <span class="highlight-pill compression">compression aging</span>, where write-time summarization drops future-relevant details; <span class="highlight-pill interference">interference aging</span>, where accumulated similar memories crowd out the target fact; <span class="highlight-pill revision">revision aging</span>, where changed or derived state is not updated correctly; and <span class="highlight-pill maintenance">maintenance aging</span>, where lifecycle events such as flushing or recompaction trigger regressions. To diagnose these failures, AgingBench uses temporal dependency graphs and paired counterfactual probes that produce diagnostic signatures for the write, retrieval, and utilization stages of the memory pipeline.</p>
       <p>Across 7 scenarios, 14 models, multiple memory policies, and both runner-controlled and autonomous agents, over ~400 runs spanning 8 - 200 sessions show that <b>agent aging is not one-dimensional</b>: behavioral tests can remain clean while factual precision decays; derived-state tracking can collapse sharply within a single model; and the same wrong answer can require incompatible repairs depending on what the diagnostic signature points to. These results suggest that reliable agent deployment requires lifespan evaluation, mechanism-level diagnosis, and stage-targeted repair, not only stronger day-one models.</p>
     </div>
   </div>
@@ -383,8 +383,8 @@
         </div>
         <div class="analysis-copy">
           <span class="pill">Diagnosis</span>
-          <h3>Same symptom, opposite fixes</h3>
-          <p>Aggregate failure rates cluster (~0.60–0.82) but the Write / Retrieval / Utilization decomposition is heterogeneous: S1 is utilization-bound, S2 write-bound, S5 flips between the two. Same number, opposite interventions.</p>
+          <h3>Same wrong answer, incompatible repairs</h3>
+          <p>Aggregate failure rates cluster (~0.60–0.82) but the Write / Retrieval / Utilization decomposition is heterogeneous: S1 is utilization-bound, S2 write-bound, S5 flips between the two. Same number, incompatible repairs.</p>
         </div>
       </article>
 
