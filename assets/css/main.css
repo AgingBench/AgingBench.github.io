@@ -146,13 +146,13 @@ a:hover { border-bottom-color: var(--accent); }
 .hero-title {
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(34px, 5.5vw, 56px);
+  font-size: clamp(24px, 5.5vw, 46px);
   line-height: 1.1;
   letter-spacing: -0.02em;
   margin: 0 0 18px;
-  color: var(--ink);
+  color: var(--accent);
 }
-.hero-title .accent { color: var(--accent); }
+.hero-title .accent { color: var(--ink); }
 .hero-tagline {
   font-size: 19px;
   line-height: 1.55;

@@ -21,6 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body data-page="index">
 
@@ -47,19 +48,19 @@
 <!-- ========== HERO ========== -->
 <section class="hero">
   <div class="container">
-    <h1 class="hero-title">AI Agents <em>Age</em> Too:<br/><span class="accent">They Quietly Decay After Deployment</span></h1>
-    <p class="hero-tagline">A longitudinal reliability benchmark suite that measure the <b>Agent Lifespan Engineering</b> for Deployed Systems.</p>
+    <h1 class="hero-title"><i class="fa-solid fa-wheelchair" style="color:#b54a2b;"></i>  Your AI Agents Have An <em>Aging</em> Problem Too:<br/><span class="accent">Agent Lifespan Engineering for Deployed Systems</span></h1>
+    <p class="hero-tagline">AI agents have lifespans, <i>AgingBench</i> measures them - a longitudinal reliability foundation for agent lifespan engineering.</p>
 
     <div class="pub-authors">
       <a href="https://zfancy.github.io" target="_blank" rel="noopener">Jianing Zhu</a><sup>*</sup>,
       <a href="https://sites.google.com/view/hey-yeonju" target="_blank" rel="noopener">Yeonju Ro</a><sup>*</sup>,
-      <a href="https://johntrob14.github.io" target="_blank" rel="noopener">John Robertson</a>,
+      <a href="https://johntrob14.github.io" target="_blank" rel="noopener">John T. Robertson</a>,
       <a href="https://www.kevin-ai.com" target="_blank" rel="noopener">Kevin Wang</a>,
       <a href="https://ljb121002.github.io" target="_blank" rel="noopener">Junbo Li</a>,
       <br/>
       <a href="https://users.ece.utexas.edu/~hvikalo/" target="_blank" rel="noopener">Haris Vikalo</a>,
       <a href="https://www.cs.utexas.edu/~akella/" target="_blank" rel="noopener">Aditya Akella</a>,
-      <a href="https://ece.utexas.edu/people/faculty/atlas-wang" target="_blank" rel="noopener">Zhangyang Wang</a>
+      <a href="https://ece.utexas.edu/people/faculty/atlas-wang" target="_blank" rel="noopener">Zhangyang "Atlas" Wang</a>
     </div>
     <div class="pub-affil">
       <span>The University of Texas at Austin</span>
@@ -90,6 +91,7 @@
       </div>
     </div>
   </div>
+  <p>
 </section>
 
 <!-- ========== ABSTRACT (recursivemas-style, .abstract-box with TL;DR badge) ========== -->
@@ -99,9 +101,9 @@
       <h2 class="section-title" style="margin-top:8px;">Abstract</h2>
     </div>
     <div class="abstract-box">
-      <p>The reliability of any long-running system degrades over time: databases accumulate stale indices, software accrues technical debt, and human memory fades with age. Memory-enabled agents are no exception. Even with frozen weights, their system state continues to change as they accumulate context across sessions, and their ability to store, retrieve, and apply knowledge deteriorates in ways that standard snapshot evaluation cannot capture. We want to diagnose <strong><em>what kind</em></strong> of degradation occurs, <strong><em>where</em></strong> in the agent's memory pipeline it originates, or <strong><em>how</em></strong> routine operational events reshape it.</p> 
-      <p><strong>AgingBench</strong> is a longitudinal reliability benchmark suite organized around four aging mechanisms: <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, and <span class="highlight-pill maintenance">maintenance</span>, with <em>component-level attribution</em> via counterfactual analysis that identifies whether degradation originates in the write, retrieval, or utilization stage of the agent's memory pipeline. We evaluate across various scenarios, models, memory policies and agent frameworks, ranging from a fully controlled runner to practical autonomous agents such as Claude Code.</p>
-      <p>Over <strong>~400 runs across 8–200 sessions</strong>, we reveal that aging is not one-dimensional: it can be <em>invisible</em> to behavioral tests while silently decaying; structurally sharp, with a single model shifting from perfect to zero accuracy on derived-state tracking; and stage-dependent, as strong models fail not at writing but at <em>reusing</em> the memory. As agents take on longer operational lifetimes, understanding the internal structure of how they age is as important as measuring how well they perform on day one.</p>
+      <p>Long-lived AI agents are increasingly deployed as persistent operational systems, yet they are still evaluated like freshly initialized models. Day-one benchmarks miss a basic systems question: <i>how long does an agent remain reliable after deployment</i>? Even when model weights are frozen, an agent's effective state keeps changing as it compresses interaction history, retrieves from a growing memory store, revises facts after updates, and undergoes routine maintenance. Reliability therefore becomes a lifespan property of the full agent harness, not only a snapshot property of the base model.</p> 
+      <p>We introduce <strong>AgingBench</strong>, a longitudinal reliability benchmark for <b>agent lifespan engineering</b>: measuring not only whether deployed agents degrade, but what form the degradation takes and where repair should target. AgingBench organizes agent <i>aging</i> into four mechanisms: <span class="highlight-pill compression">compression aging</span>, where write-time summarization drops future-relevant details; <span class="highlight-pill interference">interference aging</span>, where accumulated similar memories crowd out the target fact; <span class="highlight-pill revision">revision aging</span>, where changed or derived state is not updated correctly; and <span class="highlight-pill maintenance">maintenance aging</span>, where lifecycle events such as flushing or recompaction trigger regressions. To diagnose these failures, we uses temporal dependency graphs and paired counterfactual probes that produce diagnostic signatures for the write, retrieval, and utilization stages of the memory pipeline.</p>
+      <p>Across 7 scenarios, 14 models, multiple memory policies, and both runner-controlled and autonomous agents, over ~400 runs spanning 8 - 200 sessions show that <b>agent aging is not one-dimensional</b>: behavioral tests can remain clean while factual precision decays; derived-state tracking can collapse sharply within a single model; and the same wrong answer can require incompatible repairs depending on what the diagnostic signature points to. These results suggest that reliable agent deployment requires lifespan evaluation, mechanism-level diagnosis, and stage-targeted repair, not only stronger day-one models.</p>
     </div>
   </div>
 </section>
@@ -395,7 +397,7 @@
   <div class="container narrow">
     <h2 class="section-title">Cite this work</h2>
     <pre class="bibtex"><code id="bibtex-block">@inproceedings{agingbench2026,
-  title     = {Long-Lived AI Agents Age Too: They Quietly Decay After Deployment},
+  title     = {Your AI Agents Have An Aging Problem Too: Agent Lifespan Engineering for Deployed Systems},
   author    = {Zhu, Jianing and Ro, Yeonju and Robertson, John and Wang, Kevin and
                Li, Junbo and Vikalo, Haris and Akella, Aditya and Wang, Zhangyang},
   booktitle = {Preprint},
