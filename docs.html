@@ -242,8 +242,8 @@
       </tbody>
     </table>
 
-    <h3 class="subsection">Stage-level diagnostic signatures</h3>
-    <p>Within this conceptual pipeline decomposition, the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> ladder <strong>additively accounts for</strong> the end-to-end error across the Write, Retrieval, and Utilization stages, yielding a <strong>stage-level diagnostic signature</strong> rather than a unique causal decomposition for every architecture. The three shares are read as <em>candidate failure stages</em>:</p>
+    <h3 class="subsection">Stage-level diagnostic profile</h3>
+    <p>Within this conceptual pipeline decomposition, the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> ladder <strong>additively accounts for</strong> the end-to-end error across the Write, Retrieval, and Utilization stages, yielding a <strong>stage-level diagnostic profile</strong> rather than a unique causal decomposition for every architecture. The three shares are read as <em>candidate failure stages</em>:</p>
     <ul>
       <li><strong>Utilisation share</strong> = <code>1 − Acc<sub>P3</sub></code> → consistent with a <span class="highlight-pill revision">revision-aging signature</span> (𝒰): the model fails despite a perfect context.</li>
       <li><strong>Write share</strong> = <code>Acc<sub>P3</sub> − Acc<sub>P2</sub></code> → pointing to a <span class="highlight-pill compression">compression-aging signature</span> (𝒲): information was already underspecified at write time.</li>
@@ -254,7 +254,7 @@
     <p style="text-align:center; font-family:var(--mono); margin: 8px 0 14px;"><code>Δ𝒮 = WriteShare(t⁺) − WriteShare(t⁻)</code></p>
     <p>A discrete jump in the Write share coincident with a lifecycle event separates maintenance aging from gradual write degradation.</p>
 
-    <p class="muted-line">Implementation: <code>agingbench/diagnostics/partitioner.py</code> computes the per-session <code>DiagnosticResult</code> with all three stage shares; <code>agingbench/runner/diagnostic_mixin.py</code> drives the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> probe execution. The signatures are emitted to the <a href="#schema">AgingCard</a> under <code>mechanism_metrics</code>. Enable diagnostic probes with <code>--diagnose</code> on any <code>agingbench run</code> invocation.</p>
+    <p class="muted-line">Implementation: <code>agingbench/diagnostics/partitioner.py</code> computes the per-session <code>DiagnosticResult</code> with all three stage shares; <code>agingbench/runner/diagnostic_mixin.py</code> drives the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> probe execution. The profiles are emitted to the <a href="#schema">AgingCard</a> under <code>mechanism_metrics</code>. Enable diagnostic probes with <code>--diagnose</code> on any <code>agingbench run</code> invocation.</p>
 
     <h3 class="subsection">Aging as a runtime control problem</h3>
     <p>A long-lived agent is constantly making control decisions: what to write, what to compress, what to retrieve, when to recompact, when to flush, when to promote something into structured state. AgingBench is positioned not only as a measurement benchmark but as a <strong>testbed for runtime memory control policies</strong>. Controllers observe per-session signals (lag-recall, ws_fidelity, accumulator error, post-shock delta, token cost, latency) and choose interventions (append, compress, retrieve, recompact, flush, force-read, promote to typed state). The <code>ThresholdController</code> class in <code>core/controller.py</code> ships in v0.3.0; full CLI pluggability and reference controllers land in v1.1 (Track D).</p>
@@ -283,7 +283,7 @@
     </table>
     <p class="muted-line">Recipe-status legend: <strong>✓ verified</strong> = recipe tested end-to-end against a real source in v0.3.0; <strong>ⓘ reference</strong> = adapter parses correctly against fixtures, but the documented extraction command depends on SDK / exporter versions and hasn't been live-validated. If you already have a JSONL of the matching shape, the parser handles it regardless.</p>
 
-    <h3 class="subsection">Deployment profiles</h3>
+    <h3 class="subsection">Deployment profile</h3>
     <p>A profile bundles deployment-specific defaults — native outcome-event mappings, subject-linkage keys, per-mechanism weights, session-detection heuristics, and supplementary privacy patterns. Two profiles ship in v0.3.0:</p>
     <ul>
       <li><code>generic</code> — no domain assumptions. Outcome events must come from a separately-supplied <code>OutcomeEvent</code> JSONL because the profile cannot extract them natively.</li>
