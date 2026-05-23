@@ -70,8 +70,8 @@
 <!-- ========== SCENARIOS CATALOG ========== -->
 <section id="scenarios" class="section">
   <div class="container">
-    <h2 class="section-title">Seven deployment scenarios <span class="muted-line" style="font-size:0.55em; font-weight:400; letter-spacing:0;">+ SWE-bench-Aging extension</span></h2>
-    <p class="section-lead">Each scenario mirrors a real product surface and naturally activates a subset of mechanisms. Tier 1 (S1–S6) is runner-controlled: the harness owns the session loop, and you swap models, memory policies, components, or controllers. Tier 2 (S7) is agent-controlled: the agent owns the loop. <strong>S8</strong> ships alongside the seven canonical scenarios as a SWE-bench-Aging extension probing a Django issue chain under per-session Docker reset.</p>
+    <h2 class="section-title">Seven deployment scenarios <span class="muted-line" style="font-size:0.55em; font-weight:400; letter-spacing:0;">+ community extension</span></h2>
+    <p class="section-lead">Each scenario mirrors a real product surface and naturally activates a subset of mechanisms. Tier 1 (S1–S6) is runner-controlled: the harness owns the session loop, and you swap models, memory policies, components, or controllers. Tier 2 (S7) is agent-controlled: the agent owns the loop. We also call for <a href="#extensions-divider">Community extensions</a> (see below).</p>
 
     <article class="scenario-detail">
       <div class="scen-id">S1</div><span class="scen-tier">Tier 1</span>
@@ -159,8 +159,14 @@
       </dl>
     </article>
 
+    <!-- ========== COMMUNITY EXTENSIONS DIVIDER ========== -->
+    <div id="extensions-divider" style="margin: 36px 0 18px; padding-top: 24px; border-top: 1px dashed var(--line);">
+      <h3 class="subsection" style="margin: 0 0 6px;">Community extensions <span class="muted" style="font-weight: 400; font-size: 0.7em;">+ want a new scenario?</span></h3>
+      <p class="muted-line" style="margin: 0;">we're actively welcoming further scenario contributions — production agent deployments, domain-specific failure modes, anything that exercises a memory-aging axis we haven't covered yet.</p>
+    </div>
+
     <article class="scenario-detail">
-      <div class="scen-id">S8</div><span class="scen-tier">Tier 2</span>
+      <div class="scen-id">S8</div><span class="scen-tier">Tier 2 · extension</span>
       <h4>SWE-bench-Aging</h4>
       <p>Production coding agents (Claude Code, OpenHands) on a curated chain of real Django GitHub issues run in per-session SWE-bench Docker containers. The agent owns the loop, modifies the repo across sessions, and is verified against the upstream Django test suite plus injected synthetic consistency tests. Anchors AgingBench against an established community benchmark.</p>
       <dl>
@@ -231,7 +237,7 @@
       <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error points to utilisation.</p></div>
     </div>
 
-    <table class="cost-table" style="margin-top:18px; max-width:560px;">
+    <table class="cost-table" style="margin: 18px auto 0; max-width:560px;">
       <thead>
         <tr><th></th><th>Write (𝒲)</th><th>Read (ℛ)</th><th>Utilize (𝒰)</th></tr>
       </thead>
@@ -375,7 +381,7 @@ r = trace_to_card_v11(
 <section id="samples" class="section">
   <div class="container">
     <h2 class="section-title">Sample cards</h2>
-    <p class="section-lead">Eight canonical cards ship with the v0.3.0 release — one per scenario S1–S8. S1–S7 are generated against Haiku-4.5 + <code>lossy_compress</code> as a reference SUT; S8 (SWE-bench-Aging extension) ships with a Claude Code reference card. Useful for testing your AgingCard-consuming code without running the benchmark.</p>
+    <p class="section-lead">Seven canonical cards ship with v0.3.0 — one per scenario S1–S7, generated against Haiku-4.5 + <code>lossy_compress</code> as a reference SUT. An additional community-extension card (S8 / SWE-bench-Aging, Claude Code) ships alongside but is not paper-verified yet. Useful for testing your AgingCard-consuming code without running the benchmark.</p>
 
     <table class="schema-table">
       <thead><tr><th>File</th><th>Track</th><th>What it shows</th></tr></thead>
@@ -387,6 +393,7 @@ r = trace_to_card_v11(
         <tr><td>s5_self_planning_haiku45_lossy_compress.json</td><td>model</td><td>S5 self-planning notebook: workspace inspection + reset survival</td></tr>
         <tr><td>s6_naturalistic_haiku45_lossy_compress.json</td><td>model</td><td>S6 multi-domain recall + maintenance Δshock</td></tr>
         <tr><td>s7_research_notes_haiku45_lossy_compress.json</td><td>agent</td><td>S7 Tier-2: workspace fidelity vs. recall gap</td></tr>
+        <tr style="border-top: 2px dashed var(--line);"><td colspan="3" style="padding-top: 14px; color: var(--muted); font-size: 13px; font-weight: 500;">Community extensions <span class="muted">— not paper-verified yet</span></td></tr>
         <tr><td>s8_swe_bench_claude_code_s8.json</td><td>agent</td><td>S8 SWE-bench-Aging extension: Django issue chain under per-session Docker reset</td></tr>
       </tbody>
     </table>
