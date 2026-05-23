@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telemetry · AgingBench</title>
-  <meta name="description" content="Score the agent you're already running for agent lifespan engineering. Telemetry mode maps any production trace into the AgingCard schema — runs entirely in your browser via Pyodide." />
+  <title>Lifespan Check · AgingBench</title>
+  <meta name="description" content="Check your agent's lifespan. The Lifespan Check maps any production trace into the AgingCard schema for agent lifespan engineering — runs entirely in your browser via Pyodide." />
 
-  <meta property="og:title" content="AgingBench Telemetry — score your traces in your browser" />
+  <meta property="og:title" content="AgingBench Lifespan Check — check your agent's lifespan in your browser" />
   <meta property="og:description" content="Drop a JSONL trace from Claude Code (validated) or any JSONL with role / content / token fields. Get an AgingCard back. No upload." />
   <meta property="og:type" content="website" />
 
@@ -27,7 +27,7 @@
       <a href="use.html">Use</a>
       <a href="leaderboard.html">Leaderboard</a>
       <a href="docs.html">Docs</a>
-      <a href="telemetry.html" aria-current="page" class="nav-active">Telemetry</a>
+      <a href="telemetry.html" aria-current="page" class="nav-active">Lifespan Check</a>
     </nav>
     <div class="resource-buttons">
       <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
@@ -42,9 +42,9 @@
 <!-- ========== HERO ========== -->
 <section class="hero hero-tight">
   <div class="container">
-    <p class="venue-tag">Telemetry mode · in-browser demo</p>
-    <h1 class="hero-title">Score the agent you're already running.</h1>
-    <p class="hero-tagline">Map any production trace into the same AgingCard schema — no scenario rerun, no LLM cost, runs entirely in your browser. Nothing is uploaded.</p>
+    <p class="venue-tag">Lifespan Check · in-browser demo</p>
+    <h1 class="hero-title">Check your agent's <span class="accent">lifespan</span>.</h1>
+    <p class="hero-tagline">Map the production trace into the same AgingCard schema — no scenario rerun, no LLM cost, runs entirely in your browser. Nothing is uploaded.</p>
   </div>
 </section>
 
@@ -275,7 +275,8 @@ print(result.card["trace_audit"])</code></pre>
 <footer class="site-footer">
   <div class="container">
     <p>AgingBench · The University of Texas at Austin</p>
-    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+    <p class="muted" style="margin-top: 6px;">We're looking for collaborators with production agent traces — and sponsors for larger-scale benchmarking.</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Lifespan Check</a> · <a href="docs.html#contribute">Contribute</a></p>
   </div>
 </footer>
 

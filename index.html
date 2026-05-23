@@ -33,7 +33,7 @@
       <a href="use.html">Use</a>
       <a href="leaderboard.html">Leaderboard</a>
       <a href="docs.html">Docs</a>
-      <a href="telemetry.html">Telemetry</a>
+      <a href="telemetry.html">Lifespan Check</a>
     </nav>
     <div class="resource-buttons">
       <span class="btn btn-inert" aria-disabled="true" title="Launching soon — link goes live with the v0.3.0 release">📄 arXiv</span>
@@ -115,11 +115,11 @@
     <p class="section-lead">AgingBench is a paper, a leaderboard, and a runnable benchmark. Pick the door that matches what you want to do next.</p>
     <div class="cta-grid">
       <div class="cta-card cta-card-multi">
+        <span class="cta-eyebrow">For builders</span>
         <a class="cta-card-main" href="use.html">
-          <span class="cta-eyebrow">For builders</span>
           <h3>Run AgingBench</h3>
         </a>
-        <p>One command, ten minutes, $5. Three release modes (Lite / Full / <a class="cta-inline-pill" href="telemetry.html">▶ Telemetry</a>) and a five-track plug-and-play surface.</p>
+        <p>One command, ten minutes. Three release modes (Lite / Full / <a class="cta-inline-pill" href="telemetry.html">▶ Lifespan Check</a>) and a plug-and-play surface.</p>
         <a class="cta-card-main cta-arrow" href="use.html">→ Get started</a>
       </div>
       <a class="cta-card" href="leaderboard.html">
@@ -152,6 +152,14 @@
       <li><em>How</em> does reliability decay: through <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, or <span class="highlight-pill maintenance">maintenance</span>?</li>
       <li><em>Where</em> should repair target: <em>writing</em>, <em>retrieval</em>, <em>utilization</em>, or the memory <em>lifecycle</em>?</li>
     </ol>
+  </div>
+
+  <!-- ========== DISAMBIGUATION CHIPS ========== -->
+  <div style="margin: 28px auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; font-size: 14.5px; color: var(--muted);">
+    <span style="font-weight: 600; letter-spacing: 0.04em; font-size: 12.5px; color: var(--accent);">AgingBench is NOT:</span>
+    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">biological aging</span>
+    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">one-shot hallucination</span>
+    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">just long-context evaluation</span>
   </div>
 
   </div>
@@ -375,8 +383,8 @@
         </div>
         <div class="analysis-copy">
           <span class="pill">Overview</span>
-          <h3>Aging is multi-dimentional, measurable, and pervasive</h3>
-          <p>Across the seven scenarios, headline metrics show an overall downward trend over the deployment horizon under the (model × memory policy) combinations we tested. The rate and shape varies by mechanism, but no configuration is immune.</p>
+          <h3>Aging is multi-dimensional and measurable</h3>
+          <p>Across the seven scenarios, headline metrics tend to trend downward over the deployment horizon for the (model × memory policy) combinations we tested. The rate and shape vary by mechanism, and none of the configurations we evaluated avoided the trend.</p>
         </div>
       </article>
 
@@ -447,7 +455,8 @@
 <footer class="site-footer">
   <div class="container">
     <p>AgingBench · The University of Texas at Austin</p>
-    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Telemetry</a> · <a href="docs.html#contribute">Contribute</a></p>
+    <p class="muted" style="margin-top: 6px;">We're looking for collaborators with production agent traces — and sponsors for larger-scale benchmarking.</p>
+    <p class="muted">v0.3.0 · <a href="index.html">Home</a> · <a href="use.html">Use</a> · <a href="leaderboard.html">Leaderboard</a> · <a href="docs.html">Docs</a> · <a href="telemetry.html">Lifespan Check</a> · <a href="docs.html#contribute">Contribute</a></p>
   </div>
 </footer>
 
