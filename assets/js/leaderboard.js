@@ -3,13 +3,13 @@
 // Default sort: recall, descending. Headline metric for end-to-end self-planning quality.
 
 const LB_ROWS = [
-  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o-mini",  org: "OpenAI",    pytest: 0.13, ws_fid: 0.88, intf: 0.33, rev_ex: 0.95, accum_err: 7.7, recall: 0.42, shock: -0.04 },
-  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o",       org: "OpenAI",    pytest: 0.65, ws_fid: 0.83, intf: 0.58, rev_ex: 0.93, accum_err: 5.8, recall: 0.46, shock:  0.14 },
-  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-5-mini",   org: "OpenAI",    pytest: 0.22, ws_fid: 0.85, intf: 0.63, rev_ex: 0.69, accum_err: 0.0, recall: 0.24, shock: -0.44 },
-  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Haiku-4.5",    org: "Anthropic", pytest: 0.91, ws_fid: 0.85, intf: 0.75, rev_ex: 1.00, accum_err: 8.7, recall: 0.63, shock: -0.23 },
-  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.5",   org: "Anthropic", pytest: 0.78, ws_fid: 0.83, intf: 0.63, rev_ex: 1.00, accum_err: 7.5, recall: 0.69, shock: -0.17 },
-  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.6",   org: "Anthropic", pytest: 0.83, ws_fid: 0.83, intf: 0.94, rev_ex: 1.00, accum_err: 7.0, recall: 0.75, shock: -0.11 },
-  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Opus-4.7",     org: "Anthropic", pytest: 0.65, ws_fid: 0.75, intf: 0.94, rev_ex: 0.92, accum_err: 5.2, recall: 0.56, shock: -0.15 },
+  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o-mini",  org: "OpenAI",    pytest: 0.10, ws_fid: 0.85, intf: 0.28, rev_ex: 0.29, accum_err: 11.6, recall: 0.15, shock: -0.10 },
+  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o",       org: "OpenAI",    pytest: 0.41, ws_fid: 0.84, intf: 0.46, rev_ex: 0.87, accum_err:  5.5, recall: 0.46, shock:  0.18 },
+  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-5-mini",   org: "OpenAI",    pytest: 0.13, ws_fid: 0.85, intf: 0.67, rev_ex: 0.75, accum_err:  2.3, recall: 0.58, shock: -0.05 },
+  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Haiku-4.5",    org: "Anthropic", pytest: 0.89, ws_fid: 0.85, intf: 0.73, rev_ex: 1.00, accum_err:  8.4, recall: 0.61, shock: -0.21 },
+  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.5",   org: "Anthropic", pytest: 0.80, ws_fid: 0.84, intf: 0.66, rev_ex: 0.97, accum_err:  7.6, recall: 0.71, shock: -0.16 },
+  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.6",   org: "Anthropic", pytest: 0.82, ws_fid: 0.83, intf: 0.92, rev_ex: 1.00, accum_err:  6.8, recall: 0.74, shock: -0.10 },
+  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Opus-4.7",     org: "Anthropic", pytest: 0.67, ws_fid: 0.77, intf: 0.93, rev_ex: 0.94, accum_err:  5.4, recall: 0.64, shock: -0.11 },
 ];
 
 // Format helpers ------------------------------------------------------------
