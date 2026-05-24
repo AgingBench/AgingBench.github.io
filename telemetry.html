@@ -54,42 +54,44 @@
     <h2 class="section-title">Try it</h2>
     <p class="section-lead">Pick a pre-bundled sample, or drop a JSONL trace of your own. Computation runs locally in Pyodide (~10 MB Python WebAssembly runtime, cached on first visit).</p>
 
-    <div class="telem-panel">
+    <!-- Two-column layout: left = upload setup, right = live AgingCard
+         (pre-loaded with the canonical sample, replaced on Compute). -->
+    <div class="telem-layout">
 
-      <div class="telem-step">
-        <h3>1 · Provide a trace</h3>
-        <label class="telem-upload-label">
-          <span>Drop or select a JSONL file:</span>
-          <input id="telem-upload" type="file" accept=".jsonl,application/json,text/plain"/>
-          <span class="telem-upload-name" id="telem-upload-name">no file chosen</span>
-        </label>
-        <p class="telem-hint">No trace handy? Each <a href="#recipes">recipe card below</a> has a one-click <em>Try sample</em> button. <strong>Using Claude Code already?</strong> Your session files are on disk — see the <a href="#recipes"><code>claude_code</code> recipe</a> for the one-liner that bundles them.</p>
-      </div>
+      <!-- LEFT: provide a trace + format selector -->
+      <div class="telem-panel">
 
-      <div class="telem-step">
-        <h3>2 · Format</h3>
-        <div class="telem-options">
-          <label>format
-            <select id="telem-format">
-              <option value="claude_code">claude_code</option>
-              <option value="generic">generic</option>
-            </select>
-            <small class="telem-dropdown-hint">Auto-detected from the uploaded file when possible. <code>claude_code</code> for native Claude Code session files (default); <code>generic</code> for any JSONL with <code>session_id</code> / <code>role</code> / <code>content</code> / token fields. Five more adapters parse correctly in the codebase (<code>openai_assistants</code>, <code>openhands</code>, <code>langfuse</code>, <code>langsmith</code>, <code>otlp</code>) but aren't surfaced in the demo yet — see <a href="#other-adapters">Other adapters</a> below.</small>
+        <div class="telem-step">
+          <h3>1 · Provide a trace</h3>
+          <label class="telem-upload-label">
+            <span>Drop or select a JSONL file:</span>
+            <input id="telem-upload" type="file" accept=".jsonl,application/json,text/plain"/>
+            <span class="telem-upload-name" id="telem-upload-name">no file chosen</span>
           </label>
+          <p class="telem-hint">No trace handy? See the <a href="#recipes"><code>claude_code</code> recipe below</a> for the one-liner that bundles your local sessions, or just keep the sample card on the right.</p>
         </div>
-        <!-- Profile is implicit: telemetry-mode v1.2 uses code_assistant for all
-             behavioural-DAG inference. The choice mostly affected outcome rules
-             and mechanism weights pre-v1.2; for the demo it adds confusing UX
-             with negligible effect on the rendered card. -->
-        <button id="telem-compute" class="btn-cta">▶ Compute AgingCard</button>
+
+        <div class="telem-step">
+          <h3>2 · Format</h3>
+          <div class="telem-options">
+            <label>format
+              <select id="telem-format">
+                <option value="claude_code">claude_code</option>
+                <option value="generic">generic</option>
+              </select>
+              <small class="telem-dropdown-hint">Auto-detected from the uploaded file when possible. <code>claude_code</code> for native Claude Code session files (default); <code>generic</code> for any JSONL with <code>session_id</code> / <code>role</code> / <code>content</code> / token fields. Five more adapters parse correctly in the codebase (<code>openai_assistants</code>, <code>openhands</code>, <code>langfuse</code>, <code>langsmith</code>, <code>otlp</code>) but aren't surfaced in the demo yet — see <a href="#other-adapters">Other adapters</a> below.</small>
+            </label>
+          </div>
+          <button id="telem-compute" class="recipe-try telem-compute-btn">▶ Compute AgingCard</button>
+        </div>
+
+        <p id="telem-status" class="telem-status">Loading analysis engine…</p>
+        <p class="telem-status-hint">First visit takes ~5–15 s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
       </div>
 
-      <p id="telem-status" class="telem-status">Loading analysis engine…</p>
-      <p class="telem-status-hint">First visit takes ~5–15 s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
-    </div>
-
-    <!-- Result panel (hidden until compute) -->
-    <div id="telem-result" class="telem-result" hidden>
+      <!-- RIGHT: result panel (pre-loaded with the bundled sample on boot,
+           replaced when the user uploads + Computes). -->
+      <div id="telem-result" class="telem-result">
       <div id="telem-meta-pills" class="telem-meta-pills"></div>
 
       <!-- v1.2 Lifespan Card surface: behavior_drift / aging_trend label, trace regime,
@@ -111,7 +113,8 @@
         <summary>Show full AgingCard JSON</summary>
         <pre id="telem-raw-json"></pre>
       </details>
-    </div>
+      </div>  <!-- /#telem-result -->
+    </div>  <!-- /.telem-layout -->
   </div>
 </section>
 

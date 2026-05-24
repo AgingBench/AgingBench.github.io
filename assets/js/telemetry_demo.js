@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.7-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.8-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -108,6 +108,20 @@ _ = load_profile("code_assistant")
     `);
     setStatus("Engine ready — pick a sample or drop a JSONL.", "ready");
     enableUI();
+    // v1.2: auto-load the canonical sample on boot so the right panel
+    // shows a live AgingCard before the visitor does anything. Replaced
+    // when the user uploads + clicks Compute. Fire-and-forget — failures
+    // here shouldn't block UI.
+    autoLoadSample().catch(err => console.warn("auto-sample failed:", err));
+  }
+
+  async function autoLoadSample() {
+    const resp = await fetch(SAMPLE_BASE + "claude_code.jsonl");
+    if (!resp.ok) return;
+    const text = await resp.text();
+    setStatus("Showing sample claude_code card — upload your trace to see your own.", "ready");
+    await runFromText(text, "claude_code", "code_assistant");
+    // Don't pre-set the format dropdown — leave it at user-selectable default
   }
 
   function enableUI() {
