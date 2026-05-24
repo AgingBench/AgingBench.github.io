@@ -271,7 +271,7 @@
 <section id="telemetry" class="section">
   <div class="container">
     <h2 class="section-title">Telemetry mode reference</h2>
-    <p class="section-lead"><a href="telemetry.html">Telemetry mode</a> is the inverse of scenario mode: instead of running constructed probes against your model, it parses a JSONL trace your deployed agent has already produced and infers per-mechanism aging signals statistically. This page documents the v0.3.0 surface; recipe cards for each format live on the <a href="telemetry.html#recipes">telemetry page</a>.</p>
+    <p class="section-lead"><a href="telemetry.html">Telemetry mode</a> is the inverse of scenario mode: instead of running constructed probes against your model, it parses a JSONL trace your deployed agent has already produced and infers per-mechanism aging signals from the trace's <em>behavioral DAG</em> — the graph formed by tool calls (names + args), tool results, session boundaries, lifecycle events, and timestamps. This page documents the current telemetry-mode API; recipe cards for each format live on the <a href="telemetry.html#recipes">telemetry page</a>.</p>
 
     <h3 class="subsection">Supported trace formats</h3>
     <p>Seven adapters ship in <code>agingbench/telemetry/adapters/</code>. Each normalises its native trace shape into a canonical <code>TelemetryRecord</code> stream that downstream inference consumes format-agnostically. Adapters all pass fixture-level parse tests; the <em>extraction recipe</em> (the command to dump a JSONL from a live source) is validated only for the two formats marked ✓ in v0.3.0 — the others depend on third-party SDK versions and are pending live validation.</p>
@@ -289,8 +289,14 @@
     </table>
     <p class="muted-line">Recipe-status legend: <strong>✓ verified</strong> = recipe tested end-to-end against a real source in v0.3.0; <strong>ⓘ reference</strong> = adapter parses correctly against fixtures, but the documented extraction command depends on SDK / exporter versions and hasn't been live-validated. If you already have a JSONL of the matching shape, the parser handles it regardless.</p>
 
+    <h3 class="subsection">Trace preprocessing (Claude Code only)</h3>
+    <p>Claude Code stores each conversation as a separate <code>&lt;uuid&gt;.jsonl</code> under <code>~/.claude/projects/&lt;encoded-cwd&gt;/</code>. To analyse cross-session aging, those fragments must be concatenated into a single timestamp-sorted JSONL. The bundled helper does it in one command (other adapters already export a single file, so they don't need this step):</p>
+    <pre class="code-block"><code>python -m agingbench.telemetry.prepare_trace ~/.claude/projects/&lt;your-project-dir&gt;
+# → wrote ~/.claude/projects/&lt;your-project-dir&gt;/agingbench_trace.jsonl (N events)</code></pre>
+    <p class="muted-line">Source: <code>agingbench/telemetry/prepare_trace.py</code>. Python API: <code>from agingbench.telemetry import prepare_trace; out = prepare_trace("~/.claude/projects/&lt;dir&gt;")</code>.</p>
+
     <h3 class="subsection">Deployment profile</h3>
-    <p>A profile bundles deployment-specific defaults — native outcome-event mappings, subject-linkage keys, per-mechanism weights, session-detection heuristics, and supplementary privacy patterns. Two profiles ship in v0.3.0:</p>
+    <p>A profile bundles deployment-specific defaults — native outcome-event mappings, subject-linkage keys, per-mechanism weights, session-detection heuristics, and supplementary privacy patterns. Two profiles ship:</p>
     <ul>
       <li><code>generic</code> — no domain assumptions. Outcome events must come from a separately-supplied <code>OutcomeEvent</code> JSONL because the profile cannot extract them natively.</li>
       <li><code>code_assistant</code> — tailored for software-engineering agents (Claude Code, Cursor, Aider, Codex CLI, OpenHands). Maps native events (<code>pr_merged</code>, <code>ci_pass</code>, <code>commit_reverted</code>, <code>completion_accepted</code>, …) to <code>OutcomeEvent.outcome</code>; weights <code>revision</code> at 1.5× over the other mechanisms.</li>
@@ -313,7 +319,64 @@ r = trace_to_card_v11(
       <li><strong><code>git_log</code></strong> — walks git history alongside the trace's timestamps; commits that immediately follow an agent reply count as success, reverts count as <code>revision_fail</code>.</li>
       <li><strong><code>record_patterns</code></strong> — generic regex-based pattern matching over record text (configurable via the profile YAML's <code>outcome_rules</code>).</li>
     </ul>
-    <p class="muted-line">Specs in <code>agingbench/telemetry/outcome_extractors.py</code>. Custom extractors register via <code>register_extractor(name, fn)</code>; see the module docstring for the contract.</p>
+    <p class="muted-line">Note: outcome events are <em>optional</em>. Most production traces (Claude Code, OpenHands, etc.) don't carry them; telemetry mode uses the cross-session consistency probe below as the outcome-free headline source. Specs in <code>agingbench/telemetry/outcome_extractors.py</code>. Custom extractors register via <code>register_extractor(name, fn)</code>.</p>
+
+    <h3 class="subsection">Per-mechanism inference (behavioral DAG)</h3>
+    <p>Each of the four aging mechanisms gets a dedicated inference module under <code>agingbench/telemetry/inference/</code>. The primary signals are structural — derived from the trace's behavioral DAG rather than from text patterns over prompt/response strings:</p>
+    <table class="schema-table">
+      <thead><tr><th>mechanism</th><th>primary signals (structural)</th><th>file</th></tr></thead>
+      <tbody>
+        <tr><td><code>compression</code></td><td>saturation rate (<code>input_tokens / ctx_window</code>), context-noise ratio trajectory, tool-argument specificity slope (P3)</td><td><code>compression.py</code></td></tr>
+        <tr><td><code>interference</code></td><td>tool-name KL divergence vs early-session baseline, embedding-based goal-anchor drift (P2), tool-result lineage continuity (P4)</td><td><code>interference.py</code></td></tr>
+        <tr><td><code>revision</code></td><td>tool-result update propagation (P1) with a three-tier fallback — see next subsection</td><td><code>revision.py</code></td></tr>
+        <tr><td><code>maintenance</code></td><td>lifecycle shock detection (model swap, ctx drop, cache spike, system change) + pre/post latency or outcome delta</td><td><code>maintenance.py</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="subsection">Cross-session consistency probe (P5)</h3>
+    <p>The load-bearing telemetry-mode signal: <code>consistency.py</code> clusters user turns by sentence-transformer cosine similarity (Jaccard fallback when the encoder isn't available), then for each repeat-task cluster compares first-vs-last occurrence on tool-path Jaccard and response cosine. Output keys on the <code>consistency</code> block:</p>
+    <ul>
+      <li><code>behavior_drift_at_repeat</code> — aggregate drift in [0, 1]; used as the headline metric when no <code>OutcomeEvent</code>s are present</li>
+      <li><code>consistency_drop_trajectory</code> — per-session cumulative drift (flat list; same shape as the per-mechanism trajectories)</li>
+      <li><code>tool_path_jaccard_drop_mean</code>, <code>response_cosine_drop_mean</code> — component scores</li>
+      <li><code>n_repeated_tasks_detected</code>, <code>cluster_sizes</code> — coverage diagnostics</li>
+    </ul>
+
+    <h3 class="subsection">Three-tier revision fallback</h3>
+    <p>Revision (the "agent reverted to a stale value" signal) gets the most adapter-sensitive treatment. <code>infer_revision()</code> dispatches to one of three tiers depending on what the trace carries:</p>
+    <ol>
+      <li><strong>P1 · tool_result_update_propagation</strong> (preferred) — requires <code>tool_calls[].result_summary</code>. Tracks <code>(entity, attribute) → [(t, value)]</code> across the trace; counts agent args that reference a value older than the most-recent result for the same key.</li>
+      <li><strong>tool_argument_self_reversion</strong> (middle) — requires only <code>tool_calls[].args</code> (universal across adapters). Counts <code>v1 → v2 → v1</code> patterns on agent arg values; identifier-shaped values (UUIDs, file paths, ISO timestamps, long hex hashes) are excluded so re-references aren't mistaken for revisions.</li>
+      <li><strong>user_correction_text_patterns_fallback</strong> (final) — English regex over user prompts. Blocks tagged with this <code>derived_from</code> label are visually downweighted on the card.</li>
+    </ol>
+    <p>Both Tier 1 and Tier 2 emit canonical <code>value_supersession_*</code> field names AND legacy <code>per_session_violation_*</code> / <code>violation_trajectory_*</code> aliases so existing visualisations (including the website sparkline) keep rendering without changes.</p>
+
+    <h3 class="subsection">Dominant-mechanism selector</h3>
+    <p>Implementation: <code>agingbench/telemetry/inference/_selector.py</code>. The selector decides which single mechanism (if any) leads the Lifespan Card. Logic:</p>
+    <ol>
+      <li><strong>Classify each fired signal as <em>independent</em> or <em>shared</em>.</strong> Independent signals diagnose a single mechanism (saturation → compression; tool-KL drift → interference; value supersession → revision; lifecycle event → maintenance). The shared signal — lineage continuity drop — is compatible with multiple mechanisms and is not enough on its own.</li>
+      <li><strong>Gate.</strong> A mechanism is eligible only if at least one of its independent signals fires. Shared signals add weight on top but cannot stand alone.</li>
+      <li><strong>Argmax.</strong> Among gated mechanisms, the highest credited severity score wins unconditionally. Ties break by mechanism order (compression, interference, revision, maintenance).</li>
+      <li><strong>Empty case.</strong> If no mechanism passes the gate, the card reports <code>reason: no_independent_evidence</code> with the list of compatible mechanisms — signature and repair lines stay blank.</li>
+    </ol>
+
+    <h3 class="subsection">Lifespan Card surface (signature + repair)</h3>
+    <p>When the selector returns a single dominant mechanism, two static lookups in <code>agingbench/telemetry/card_lookups.py</code> produce the card's human-readable closing lines:</p>
+    <ul>
+      <li><strong><code>MECHANISM_TO_STAGE</code></strong> — maps mechanism → memory-pipeline stage (W = write, R = retrieval, U = utilization, S = store). <code>diagnostic_signature("revision")</code> returns <code>"utilization-dominant (U-stage)"</code>.</li>
+      <li><strong><code>MECHANISM_TO_REPAIR</code></strong> — maps mechanism → recommended repair recipe. <code>recommended_repair("revision")</code> returns <code>"typed state for derived values..."</code>.</li>
+    </ul>
+    <p>A pure-Python card renderer (<code>card_render.render_card_ascii(trace_audit)</code>) produces the rich-format ASCII card shown in the demo and used by the website's <code>📸 Save as PNG</code> action.</p>
+
+    <h3 class="subsection">Headline policy (outcome-free by default)</h3>
+    <p>The card's top-line "how fast is this aging" metric is selected dynamically based on what the trace carries — four tiers tried in order:</p>
+    <ol>
+      <li><code>half_life</code> — when <code>OutcomeEvent</code>s are present (or an extractor fires)</li>
+      <li><code>behavior_drift_at_repeat</code> — when ≥ 1 repeat-task cluster is detected (each cluster ≥ 2 occurrences)</li>
+      <li><code>aging_trend</code> — when the aggregate per-session severity sum across the four mechanism blocks is monotonically rising over ≥ 3 sessions</li>
+      <li><code>not_measurable</code> — when none of the above apply</li>
+    </ol>
+    <p>The <code>headline.source</code> field carries the chosen tier. <code>headline.aging_detected</code> is true when the chosen signal exceeds a meaningful threshold (decay slope &lt; −0.01, or behavior drift &gt; 10%, or aging trend slope &gt; 0.01).</p>
 
     <h3 class="subsection">Coverage + trajectory verdicts</h3>
     <p>Every per-mechanism inference block carries two verdict strings so a low score can never be confused with "agent didn't age." The full enum:</p>
@@ -334,8 +397,16 @@ r = trace_to_card_v11(
       <li><code>ceiling_degradation</code> / <code>ceiling_healthy</code> — series has saturated at the ceiling</li>
     </ul>
 
+    <h3 class="subsection">Conceptual mapping to scenarios mode</h3>
+    <p>The four-mechanism vocabulary is inherited from scenarios mode, where each mechanism is operationalised against the gold dependency DAG. Without gold, telemetry signals are proxies — but not all equally faithful:</p>
+    <ul>
+      <li><strong>Revision and Maintenance</strong> map cleanly: P1's tool-result-update propagation is operationally analogous to scenarios-mode revision probes; lifecycle-shock pre/post deltas mirror the maintenance probe structure.</li>
+      <li><strong>Compression and Interference</strong> map indirectly: telemetry signals (saturation, KL drift, lineage drop) are necessary conditions and downstream symptoms, not direct measurements of the mechanism without a gold fact list / confusable cluster definition.</li>
+    </ul>
+    <p>Net framing: telemetry mode performs mechanism-level <em>triangulation</em> (multiple structural signals stacked to constrain the mechanism story), where scenarios mode performs mechanism-level <em>identification</em> against gold. Both useful; not interchangeable.</p>
+
     <h3 class="subsection">For the math</h3>
-    <p>Per-mechanism inference functions live in <code>agingbench/telemetry/inference/</code> — one file per mechanism (<code>compression.py</code>, <code>interference.py</code>, <code>revision.py</code>, <code>maintenance.py</code>), with the shared verdict thresholds in <code>_verdict.py</code>. The trace-to-card pipeline plus its v1.1 roadmap (CLI subcommand, MCP event streaming) is documented in <code>agingbench/telemetry/README.md</code>.</p>
+    <p>Per-mechanism inference functions live in <code>agingbench/telemetry/inference/</code> — one file per mechanism (<code>compression.py</code>, <code>interference.py</code>, <code>revision.py</code>, <code>maintenance.py</code>), plus the cross-session consistency probe (<code>consistency.py</code>), the dominant-mechanism arbitration (<code>_selector.py</code>), shared verdict thresholds (<code>_verdict.py</code>), and lightweight text/clustering helpers (<code>_text_utils.py</code>). Lifespan-card-rendering helpers live alongside in <code>card_lookups.py</code> + <code>card_render.py</code>; the Claude Code preprocessor is in <code>prepare_trace.py</code>. End-to-end pipeline + design notes in <code>agingbench/telemetry/README.md</code>.</p>
   </div>
 </section>
 
