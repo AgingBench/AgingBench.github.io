@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.9" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.10" />
 </head>
 <body data-page="telemetry">
 
@@ -87,6 +87,10 @@
 
         <p id="telem-status" class="telem-status">Loading analysis engine…</p>
         <p class="telem-status-hint">First visit takes ~5–15 s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
+
+        <!-- Fallback: pre-bundled sample if the visitor has no trace handy. -->
+        <div class="telem-or-divider"><span>or</span></div>
+        <button data-sample="claude_code" class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample A (~4 sessions, all 4 mechanisms fire)</button>
       </div>
 
       <!-- RIGHT: result panel (pre-loaded with the bundled sample on boot,
@@ -143,7 +147,6 @@ python -m agingbench.telemetry.prepare_trace ~/.claude/projects/&lt;your-project
 ls ~/.claude/projects/             # macOS / Linux
 dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
         <p class="recipe-privacy">Contains: your prompts, agent replies, tool calls, token counts. PII patterns (emails, API keys, IPs) are auto-redacted before metric inference. <strong>Aging signal needs ≥3 sessions</strong> — picking a single <code>.jsonl</code> will trip the <code>coverage: underpowered</code> warning.</p>
-        <button data-sample="claude_code" class="recipe-try">▶ Try sample (~4 sessions, all 4 mechanisms fire)</button>
       </article>
 
       <article class="recipe-card">
@@ -190,6 +193,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.9"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.10"></script>
 </body>
 </html>

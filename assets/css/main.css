@@ -3192,6 +3192,29 @@ a:hover { border-bottom-color: var(--accent); }
   font-weight: 600;
   font-size: 14px;
 }
+/* Fallback sample button: extra top margin so it reads as an
+   alternate path, not a "step 3" in the upload flow above. */
+.telem-sample-btn {
+  margin-top: 10px;
+}
+.telem-or-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.telem-or-divider::before,
+.telem-or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
 .telem-step h3 {
   margin: 0 0 10px;
   font-family: var(--mono);
