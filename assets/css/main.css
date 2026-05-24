@@ -3481,7 +3481,19 @@ a:hover { border-bottom-color: var(--accent); }
 .telem-verdict.is-bad     { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
 .telem-verdict.is-neutral { background: var(--bg); color: var(--muted); border-color: var(--line); }
 
-.telem-actions { margin-top: 18px; }
+.telem-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.telem-action-btn {
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
 .telem-raw {
   margin-top: 14px;
   border-top: 1px solid var(--line);

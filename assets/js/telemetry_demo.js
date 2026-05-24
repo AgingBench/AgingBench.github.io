@@ -603,6 +603,79 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
       });
     }
 
+    // v1.2: Save the rendered AgingCard region (#telem-card-snapshot) as PNG.
+    // Lazy-loads html-to-image from CDN on first click — keeps the page-load
+    // budget for users who never click the button.
+    const savePng = $("#telem-save-png");
+    if (savePng) {
+      savePng.addEventListener("click", async () => {
+        const target = document.getElementById("telem-card-snapshot");
+        if (!target) return;
+        savePng.disabled = true;
+        const originalText = savePng.textContent;
+        savePng.textContent = "Rendering…";
+        try {
+          const lib = await _loadHtmlToImage();
+          const dataUrl = await lib.toPng(target, {
+            backgroundColor: getComputedStyle(document.body).getPropertyValue("--bg") || "#ffffff",
+            pixelRatio: 2,   // crisper on retina + when zoomed
+          });
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = "aging_card.png";
+          a.click();
+        } catch (err) {
+          console.error("PNG render failed:", err);
+          setStatus(`PNG render failed: ${err.message || err}`, "error");
+        } finally {
+          savePng.disabled = false;
+          savePng.textContent = originalText;
+        }
+      });
+    }
+
+    // v1.2: Share on X — open Twitter's web intent with a pre-filled tweet
+    // built from the current card's headline + dominant mechanism.
+    const shareX = $("#telem-share-twitter");
+    if (shareX) {
+      shareX.addEventListener("click", () => {
+        if (!lastResult) return;
+        const audit = (lastResult.card && lastResult.card.trace_audit) || {};
+        const hb = audit.headline || {};
+        const dm = audit.dominant_mechanism || {};
+        const lines = ["My agent's Lifespan Card:"];
+        if (hb.label)  lines.push("• " + hb.label);
+        if (dm.dominant && audit.signature) {
+          lines.push("• Dominant: " + dm.dominant + " (" + audit.signature + ")");
+        }
+        if (audit.repair) lines.push("• Repair: " + audit.repair);
+        lines.push("");
+        lines.push("Check yours @ AgingBench Lifespan Check");
+        const text = lines.join("\n");
+        const url  = "https://agingbench.github.io/telemetry.html";
+        const intent =
+          "https://twitter.com/intent/tweet" +
+          "?text=" + encodeURIComponent(text) +
+          "&url="  + encodeURIComponent(url)  +
+          "&hashtags=" + encodeURIComponent("AgingBench,AgentLifespan");
+        window.open(intent, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    // Lazy-load html-to-image (used by Save-as-PNG). 30-ish KB; only
+    // fetched on first click — keeps the cold-load budget tight.
+    async function _loadHtmlToImage() {
+      if (window.htmlToImage) return window.htmlToImage;
+      await new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js";
+        s.onload  = resolve;
+        s.onerror = () => reject(new Error("could not load html-to-image from CDN"));
+        document.head.appendChild(s);
+      });
+      return window.htmlToImage;
+    }
+
     // ─── Probe-card upload + merge ───
     const probeUpload = $("#telem-probe-upload");
     const probeName   = $("#telem-probe-upload-name");

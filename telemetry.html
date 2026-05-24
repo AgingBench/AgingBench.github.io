@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.11" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.12" />
 </head>
 <body data-page="telemetry">
 
@@ -99,19 +99,25 @@
       <div id="telem-result" class="telem-result">
       <div id="telem-meta-pills" class="telem-meta-pills"></div>
 
-      <!-- v1.2 Lifespan Card surface: behavior_drift / aging_trend label, trace regime,
-           dominant-mechanism arbitration, diagnostic signature, recommended repair. -->
-      <div id="telem-v12-surface" class="telem-v12-surface" hidden></div>
+      <!-- Everything inside #telem-card-snapshot is captured by the
+           Save-as-PNG button. v12 surface + mechanism trajectories +
+           telemetry summary — the screenshot-shareable region. -->
+      <div id="telem-card-snapshot">
+        <!-- v1.2 Lifespan Card surface: behavior_drift / aging_trend label, trace regime,
+             dominant-mechanism arbitration, diagnostic signature, recommended repair. -->
+        <div id="telem-v12-surface" class="telem-v12-surface" hidden></div>
 
-      <h3>Per-mechanism trajectories</h3>
-      <div id="telem-mech-grid" class="telem-mech-grid"></div>
+        <h3>Per-mechanism trajectories</h3>
+        <div id="telem-mech-grid" class="telem-mech-grid"></div>
 
-      <h3>Telemetry summary</h3>
-      <div id="telem-cost-block" class="telem-cost-block"></div>
-
+        <h3>Telemetry summary</h3>
+        <div id="telem-cost-block" class="telem-cost-block"></div>
+      </div>
 
       <div class="telem-actions">
-        <button id="telem-download" class="btn-cta">Download AgingCard JSON</button>
+        <button id="telem-save-png" class="recipe-try telem-action-btn">📸 Save as PNG</button>
+        <button id="telem-share-twitter" class="recipe-try telem-action-btn">🐦 Share on X</button>
+        <button id="telem-download" class="recipe-try telem-action-btn">⬇ Download JSON</button>
       </div>
 
       <details class="telem-raw">
@@ -194,6 +200,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.11"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.12"></script>
 </body>
 </html>
