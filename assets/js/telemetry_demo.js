@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.5-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.7-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -535,7 +535,8 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
         if (!resp.ok) { setStatus(`Sample not found.`, "error"); return; }
         const text = await resp.text();
         $("#telem-format").value = fmt;
-        await runFromText(text, fmt, $("#telem-profile").value);
+        // v1.2: profile dropdown removed; always use code_assistant.
+        await runFromText(text, fmt, "code_assistant");
       });
     });
 
@@ -568,7 +569,7 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
       btn.addEventListener("click", async () => {
         const text = upload && upload.dataset.payload;
         if (!text) { setStatus("Drop a JSONL file or pick a sample.", "error"); return; }
-        await runFromText(text, $("#telem-format").value, $("#telem-profile").value);
+        await runFromText(text, $("#telem-format").value, "code_assistant");
       });
     }
 

@@ -67,23 +67,20 @@
       </div>
 
       <div class="telem-step">
-        <h3>2 · Format &amp; profile</h3>
+        <h3>2 · Format</h3>
         <div class="telem-options">
           <label>format
             <select id="telem-format">
-              <option value="generic">generic</option>
               <option value="claude_code">claude_code</option>
-            </select>
-            <small class="telem-dropdown-hint">Only the two v0.3.0-verified formats are exposed here. <code>claude_code</code> for native Claude Code session files; <code>generic</code> for any JSONL with <code>session_id</code> / <code>role</code> / <code>content</code> / token fields. Five more adapters parse correctly in the codebase but aren't surfaced in the demo yet — see <a href="#other-adapters">Other adapters</a> below. To use those, call <code>trace_to_card_v11(...)</code> via the <a href="#for-terminal-users">Python API</a>.</small>
-          </label>
-          <label>profile
-            <select id="telem-profile">
               <option value="generic">generic</option>
-              <option value="code_assistant">code_assistant</option>
             </select>
-            <small class="telem-dropdown-hint"><code>code_assistant</code> for coding-agent traces (Claude Code, Cursor, OpenHands, etc.) where probes &amp; tool calls are file-edit-heavy. <code>generic</code> for chat / RAG / support-bot traces.</small>
+            <small class="telem-dropdown-hint">Auto-detected from the uploaded file when possible. <code>claude_code</code> for native Claude Code session files (default); <code>generic</code> for any JSONL with <code>session_id</code> / <code>role</code> / <code>content</code> / token fields. Five more adapters parse correctly in the codebase (<code>openai_assistants</code>, <code>openhands</code>, <code>langfuse</code>, <code>langsmith</code>, <code>otlp</code>) but aren't surfaced in the demo yet — see <a href="#other-adapters">Other adapters</a> below.</small>
           </label>
         </div>
+        <!-- Profile is implicit: telemetry-mode v1.2 uses code_assistant for all
+             behavioural-DAG inference. The choice mostly affected outcome rules
+             and mechanism weights pre-v1.2; for the demo it adds confusing UX
+             with negligible effect on the rendered card. -->
         <button id="telem-compute" class="btn-cta">▶ Compute AgingCard</button>
       </div>
 
@@ -178,47 +175,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
       </ul>
       <p class="muted-line">Adapter source + per-format input contract in <code>agingbench/telemetry/adapters/</code>. Promote one of these to the validated set by contributing a tested recipe against a live source — see <a href="docs.html#contribute">Contribute</a>.</p>
     </div>
-  </div>
-</section>
-
-<!-- ========== TERMINAL ONE-LINER ========== -->
-<section id="for-terminal-users" class="section bg-soft">
-  <div class="container narrow">
-    <h2 class="section-title">For terminal users</h2>
-    <p>The same pipeline is callable from your shell — no browser required. The fastest path is a one-liner:</p>
-    <pre class="code-block"><code>pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
-python -c "from agingbench.telemetry import trace_to_card_v11 as f; \
-import json; r = f(trace_jsonl='trace.jsonl', trace_format='claude_code', profile='code_assistant'); \
-print(json.dumps(r.card['headline'], indent=2))"</code></pre>
-    <p>Telemetry mode is the one path that needs <em>no</em> API key — it parses your trace locally and infers per-mechanism aging signals statistically. Or, for a fuller workflow (dumps both the headline and the per-mechanism <code>trace_audit</code> block):</p>
-    <pre class="code-block"><code>pip install "git+https://github.com/AgingBench/AgingBench.git@v0.3.0#subdirectory=prototype"
-
-from agingbench.telemetry import trace_to_card_v11
-
-result = trace_to_card_v11(
-    trace_jsonl="path/to/your_trace.jsonl",
-    trace_format="claude_code",          # or: openai_assistants, openhands, langfuse, langsmith, otlp, generic
-    profile="code_assistant",            # or: generic
-    extract_outcomes=["claude_session_flags", "record_patterns"],
-)
-print(result.card["headline"])
-print(result.card["trace_audit"])</code></pre>
-    <p class="muted-line">A first-class <code>agingbench telemetry</code> CLI subcommand wrapping the above lands in v1.1. See <a href="docs.html#telemetry">the telemetry reference in the docs</a> for the format/profile/extractor catalogue and the <a href="docs.html#schema">AgingCard schema reference</a> for the full output shape.</p>
-  </div>
-</section>
-
-<!-- ========== HOW IT WORKS ========== -->
-<section class="section">
-  <div class="container narrow">
-    <h2 class="section-title">How it works</h2>
-    <p>Telemetry mode is the inverse of scenario mode. Instead of running constructed probes against your model, it parses a JSONL trace that your deployed agent already produced and infers per-mechanism aging signals statistically:</p>
-    <ul>
-      <li><strong>Compression</strong> — context-saturation rate, self-contradiction across sessions, fact-density slope, context-noise ratio trajectory</li>
-      <li><strong>Interference</strong> — tool-call distribution KL drift over sessions, goal-anchor drift trajectory</li>
-      <li><strong>Revision</strong> — user-correction repetition rate, stale-value citation rate, per-session violation trajectory</li>
-      <li><strong>Maintenance</strong> — model-swap / context-reset shock detection, pre/post deltas, intervention-rate trajectory</li>
-    </ul>
-    <p>Every block carries a <code>coverage.verdict</code> field (<code>strong / adequate / weak / underpowered / no_test_fired</code>) so a low score can't be confused with "agent didn't age." Trajectories also ship with a saturation-aware verdict (<code>rising_degradation</code>, <code>floor_healthy</code>, etc.) — see <a href="docs.html#telemetry">the telemetry reference</a> for the full verdict glossary, and <code>agingbench/telemetry/inference/</code> in the repo for the per-mechanism math.</p>
   </div>
 </section>
 
