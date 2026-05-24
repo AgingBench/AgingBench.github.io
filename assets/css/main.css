@@ -356,6 +356,9 @@ a:hover { border-bottom-color: var(--accent); }
   border-bottom: 1px solid var(--line);
 }
 .section.bg-soft { background: var(--bg-soft); }
+/* Inline rust highlight — matches the hero h1 base color so a keyword
+   in a section-title visually echoes "Check your agent's" in the hero. */
+.rust { color: var(--accent); }
 .section-title {
   font-family: var(--serif);
   font-weight: 700;
