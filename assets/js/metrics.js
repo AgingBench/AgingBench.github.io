@@ -48,20 +48,20 @@ const METRICS = {
   },
   accum_err: {
     full: "accumulator_error(t)",
-    scenario: "S2 · Lifestyle Assistant",
-    mechanism: "Revision",
+    scenario: "S2 (Tier 1) · S7 (Tier 2)",
+    mechanism: "Revision (derived state)",
     direction: "lower is better",
     formula: "|v_agent(t) − v_gold(t)|",
-    description: "Absolute error between the agent's reported running total and the ground-truth value computed from the full delta history. Catches compounding drift that keyword recall would miss.",
+    description: "DAG-derived metric: absolute error between the agent's reported running total and the ground-truth value computed from the FactGraph's delta history. v_agent is extracted from the probe response by regex. Catches compounding drift that keyword recall would miss; used on S2 in the Tier-1 table and on S7 in the Tier-2 table.",
     example: "User logs charges of $50 + $80 + $64 + $30 against a $1,000 monthly budget across 8 sessions. Gold balance = 1000 − 224 = $776. If the agent reports $840, accumulator_error = |840 − 776| = 64."
   },
   s7_recall: {
     full: "recall_accuracy(t)",
-    scenario: "S7 · Self-Planning Agent",
+    scenario: "S5 · Self-Planning Notebook · S7 · Research-Notes Coding Task",
     mechanism: "Self-managed retrieval",
     direction: "higher is better",
     formula: "(1/|P_t|) Σ_{p ∈ P_t} s(p)",
-    description: "Average per-probe recall score in session t over the agent-managed workspace. Each s(p) ∈ [0,1] from keyword match. Probes are answered through the agent's own tool-calling loop, not by direct memory lookup.",
+    description: "Average per-probe recall score in session t over the agent-managed workspace. Each s(p) ∈ [0,1] from keyword match against the gold answer. Probes are answered through the agent's own tool-calling loop, not by direct memory lookup. The same metric definition is used for both S5 (Tier-1 runner-managed workspace) and S7 (Tier-2 agent-managed workspace).",
     example: "Agent uses fs_read('notes/budgets.md') and grep('Q1') to answer the probe. If 4 of 5 expected keywords appear in the final answer, s(p) = 0.8."
   },
   shock: {
@@ -108,15 +108,6 @@ const METRICS = {
     formula: "fraction of post-update probes where the agent cites the new value, not the stale one",
     description: "Explicit-revision variant of S7's recall: a fact is updated mid-deployment and the probe asks for the current value. Distinct from accum_err which targets derived running-totals.",
     example: "Workspace fact \u201Cdining_budget = $173\u201D is replaced at session 6 by \u201Cdining_budget = $215.\u201D Probe at session 9 asks \u201CWhat\u2019s the dining budget?\u201D If the agent answers $173, the probe scores 0."
-  },
-  s7p_recall: {
-    full: "S7 recall m_F",
-    scenario: "S7 · Self-Planning Agent",
-    mechanism: "Self-managed retrieval",
-    direction: "higher is better",
-    formula: "(1/|P_t|) Σ s(p) over S7 probes",
-    description: "Same family as recall_accuracy but re-scoped to the S7 probe suite (research-notes plus maintenance-shock probes). Not directly comparable to Tier-1 recall.",
-    example: "Same kind of measurement as the runner-controlled recall column, but graded against probes specifically designed to stress autonomous-agent failure modes."
   },
   cvr: {
     full: "CVR(t)",
