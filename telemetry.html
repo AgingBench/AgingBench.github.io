@@ -95,6 +95,10 @@
     <div id="telem-result" class="telem-result" hidden>
       <div id="telem-meta-pills" class="telem-meta-pills"></div>
 
+      <!-- v1.2 Lifespan Card surface: behavior_drift / aging_trend label, trace regime,
+           dominant-mechanism arbitration, diagnostic signature, recommended repair. -->
+      <div id="telem-v12-surface" class="telem-v12-surface" hidden></div>
+
       <h3>Headline <span class="muted" style="font-weight:400;font-size:0.85em;">(hover any cell for what it means)</span></h3>
       <div class="telem-headline-grid">
         <div title="Headline score at the LAST session in the trace. 1.0 = no measurable degradation; 0 = total collapse.">
@@ -181,16 +185,17 @@ agingbench run \
           <h3>claude_code</h3>
           <span class="friction-badge friction-low">drop-in · verified</span>
         </header>
-        <p class="recipe-what">Files Claude Code already writes — no export step. Each <code>.jsonl</code> = one session; concatenate several so aging signal can be computed.</p>
-        <pre class="recipe-cmd"># macOS / Linux — bundle your 10 most recent sessions:
-ls -t ~/.claude/projects/*/*.jsonl | head -10 | xargs cat &gt; /tmp/cc_combined.jsonl
+        <p class="recipe-what">Files Claude Code already writes — no export step. Each <code>.jsonl</code> = one conversation; we bundle them all into one timestamp-sorted trace for cross-session aging signal.</p>
+        <pre class="recipe-cmd"># Cross-platform (macOS / Linux / Windows) — one command:
+pip install agingbench
+python -m agingbench.telemetry.prepare_trace ~/.claude/projects/&lt;your-project-dir&gt;
+# → wrote ~/.claude/projects/&lt;your-project-dir&gt;/agingbench_trace.jsonl (N events)
 
-# Windows (PowerShell):
-Get-ChildItem $env:USERPROFILE\.claude\projects\*\*.jsonl |
-  Sort LastWriteTime -Desc | Select -First 10 |
-  Get-Content | Set-Content $env:TEMP\cc_combined.jsonl
+# Then drop agingbench_trace.jsonl into Step 1 and pick format=claude_code.
 
-# Then drop the combined file into Step 1 and pick format=claude_code.</pre>
+# Don't know which project dir is yours? List them:
+ls ~/.claude/projects/             # macOS / Linux
+dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
         <p class="recipe-privacy">Contains: your prompts, agent replies, tool calls, token counts. PII patterns (emails, API keys, IPs) are auto-redacted before metric inference. <strong>Aging signal needs ≥3 sessions</strong> — picking a single <code>.jsonl</code> will trip the <code>coverage: underpowered</code> warning.</p>
         <button data-sample="claude_code" class="recipe-try">▶ Try sample (~4 sessions, all 4 mechanisms fire)</button>
       </article>

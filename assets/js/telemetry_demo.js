@@ -207,9 +207,14 @@ __telem_out = json.dumps(_safe_floats({
     const slope = block[slopeKey];
     const verdict = block[verdictKey];
     const cov = block.coverage || {};
+    // v1.2: per-mechanism 5-star strength meter + dominant-mechanism highlight
+    const dm = audit.dominant_mechanism || {};
+    const stars = _mechanismStars(mech, block, dm.dominant, dm.co_dominant || []);
+    const isDom = mech === dm.dominant;
     return `
-      <div class="telem-mech telem-mech-${mechClass}">
-        <h4>${label}</h4>
+      <div class="telem-mech telem-mech-${mechClass}${isDom ? " telem-mech-dominant" : ""}">
+        <h4>${label}${isDom ? ' <span class="telem-dom-tag">dominant</span>' : ""}</h4>
+        <div class="telem-mech-stars" title="strength: ${stars.filled}/5 (independent signal evidence)">${stars.html}</div>
         <div class="telem-mech-spark">${sparkline(traj)}</div>
         <div class="telem-mech-meta">
           <span>slope: <strong>${slope == null ? "—" : (slope >= 0 ? "+" : "") + Number(slope).toFixed(4)}</strong></span>
@@ -221,6 +226,109 @@ __telem_out = json.dumps(_safe_floats({
         </div>
       </div>
     `;
+  }
+
+  // ─── v1.2: 5-star strength meter (mirrors card_render.py::_mechanism_strength) ───
+  function _isDegrading(v) {
+    return v === "rising_degradation" || v === "falling_degradation"
+        || v === "floor_degradation"  || v === "ceiling_degradation";
+  }
+  function _mechanismStars(mech, b, dominant, coDom) {
+    let s = 0;
+    if (mech === "compression") {
+      const sat = b.saturation_session_rate || 0;
+      if (sat > 0.7) s += 2.5; else if (sat > 0.3) s += 1.5; else if (sat > 0.05) s += 0.5;
+      if (_isDegrading(b.context_noise_verdict)) s += 1.0;
+      if (_isDegrading(b.tool_argument_specificity_verdict)) s += 1.5;
+    } else if (mech === "interference") {
+      const kl = b.tool_kl_mean_post_baseline || 0;
+      if (kl > 0.2) s += 2.5; else if (kl > 0.1) s += 1.5; else if (kl > 0.05) s += 0.5;
+      if (_isDegrading(b.goal_anchor_drift_verdict)) s += 1.0;
+      if (_isDegrading(b.lineage_continuity_verdict)) s += 1.0;
+    } else if (mech === "revision") {
+      const n = b.n_stale_propagations || 0;
+      if (n > 50) s += 3.0; else if (n > 20) s += 2.5; else if (n > 5) s += 1.5; else if (n > 0) s += 0.5;
+      if (_isDegrading(b.value_supersession_verdict) || _isDegrading(b.violation_trajectory_verdict)) s += 1.0;
+      if ((b.n_entities_tracked || 0) >= 5) s += 0.5;
+    } else if (mech === "maintenance") {
+      const d = b.median_outcome_rate_delta;
+      if (d != null) {
+        if (d < -0.15) s += 3.0;
+        else if (d < -0.05) s += 1.5;
+        else if (d < -0.01) s += 0.5;
+      }
+      if (_isDegrading(b.intervention_rate_verdict)) s += 1.5;
+    }
+    if (mech === dominant) s = Math.max(s, 4.0);
+    else if ((coDom || []).indexOf(mech) >= 0) s = Math.max(s, 3.0);
+    const filled = Math.max(0, Math.min(5, Math.round(s)));
+    return { filled, html: "★".repeat(filled) + "☆".repeat(5 - filled) };
+  }
+
+  function _escapeHtml(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // ─── v1.2: render the Lifespan Card surface (headline + dominant + signature + repair) ───
+  function renderTelemetryV12CardSurface(audit) {
+    const surface = document.getElementById("telem-v12-surface");
+    if (!surface) return;  // Older HTML; skip silently.
+
+    const hb     = audit.headline      || {};
+    const regime = audit.trace_regime  || {};
+    const dm     = audit.dominant_mechanism || {};
+
+    const parts = [];
+
+    if (hb.label) {
+      parts.push(
+        `<div class="telem-v12-label" title="source: ${_escapeHtml(hb.source || "")}">${_escapeHtml(hb.label)}</div>`
+      );
+    }
+    if (regime.adapter || regime.n_sessions != null) {
+      const bits = [];
+      if (regime.tool_using != null) bits.push(regime.tool_using ? "tool-using" : "chat-only");
+      if (regime.n_sessions != null) bits.push(`${regime.n_sessions} sessions`);
+      if (regime.outcomes)           bits.push(`outcomes:${_escapeHtml(regime.outcomes)}`);
+      if (regime.adapter)            bits.push(`adapter:${_escapeHtml(regime.adapter)}`);
+      parts.push(`<div class="telem-v12-regime">Trace regime: ${bits.join(" · ")}</div>`);
+    }
+
+    if (dm.dominant) {
+      const scores = dm.scores || {};
+      const top    = dm.dominant;
+      const others = Object.entries(scores).filter(([k]) => k !== top).sort((a, b) => b[1] - a[1]);
+      let runnerUp = "";
+      if (others.length && others[0][1] > 0) {
+        const margin = (scores[top] / others[0][1]).toFixed(2);
+        runnerUp = ` vs runner-up ${_escapeHtml(others[0][0])} ${others[0][1].toFixed(2)}, margin ${margin}×`;
+      }
+      parts.push(
+        `<div class="telem-v12-dom">Dominant mechanism: <strong>${_escapeHtml(top)}</strong>` +
+        `<span class="telem-v12-dom-meta"> (score ${scores[top].toFixed(2)}${runnerUp})</span></div>`
+      );
+    } else if (dm.reason === "co_dominant") {
+      parts.push(
+        `<div class="telem-v12-dom">Dominant mechanism: <strong>co-dominant</strong>` +
+        `<span class="telem-v12-dom-meta"> (${(dm.co_dominant || []).map(_escapeHtml).join(" + ")})</span></div>`
+      );
+    } else if (dm.reason === "no_independent_evidence") {
+      parts.push(
+        `<div class="telem-v12-dom">Dominant mechanism: <em>no independent evidence</em>` +
+        `<span class="telem-v12-dom-meta"> compatible: ${(dm.compatible || []).map(_escapeHtml).join(", ")}</span></div>`
+      );
+    }
+
+    if (audit.signature) {
+      parts.push(`<div class="telem-v12-sig">Diagnostic signature: <strong>${_escapeHtml(audit.signature)}</strong></div>`);
+    }
+    if (audit.repair) {
+      parts.push(`<div class="telem-v12-repair">Recommended repair: ${_escapeHtml(audit.repair)}</div>`);
+    }
+
+    surface.innerHTML = parts.join("");
+    surface.hidden = parts.length === 0;
   }
 
   function renderResult(out) {
@@ -241,7 +349,13 @@ __telem_out = json.dumps(_safe_floats({
     renderCost(card);
 
     const audit = card.trace_audit || {};
+    renderTelemetryV12CardSurface(audit);
     $("#telem-mech-grid").innerHTML = [
+      // v1.2: consistency is the load-bearing "aging-happened" detector,
+      // rendered first as the 5th-and-largest sparkline.
+      renderMechanism(audit, "consistency",  "⓪ Consistency",
+                      "consistency_drop_trajectory", "consistency_drop_slope",
+                      "consistency_drop_verdict", "consistency"),
       renderMechanism(audit, "compression",  "① Compression",
                       "context_noise_ratio_trajectory", "context_noise_slope",
                       "context_noise_verdict", "compression"),

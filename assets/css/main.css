@@ -3348,6 +3348,39 @@ a:hover { border-bottom-color: var(--accent); }
 .telem-mech-interference { border-left-color: var(--m-interference); color: var(--m-interference); }
 .telem-mech-revision     { border-left-color: var(--m-revision);     color: var(--m-revision); }
 .telem-mech-maintenance  { border-left-color: var(--m-maintenance);  color: var(--m-maintenance); }
+/* v1.2: consistency = 5th sparkline (load-bearing headline detector). Span both
+   columns at the top of the grid so it's visually the headline strip. */
+.telem-mech-consistency  { border-left-color: var(--ink); color: var(--ink); grid-column: 1 / -1; background: var(--bg); }
+.telem-mech-dominant { box-shadow: 0 0 0 2px var(--ink) inset; }
+.telem-dom-tag {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; margin-left: 6px;
+  border: 1px solid var(--ink); border-radius: 4px; color: var(--ink);
+  vertical-align: middle;
+}
+.telem-mech-stars {
+  font-family: var(--mono); font-size: 14px; letter-spacing: 2px;
+  color: var(--ink); margin: 2px 0 6px;
+}
+
+/* v1.2 Lifespan Card surface (headline label + regime + dominant + signature + repair) */
+.telem-v12-surface {
+  margin: 12px 0 18px;
+  padding: 14px 18px;
+  background: var(--bg-soft);
+  border-left: 3px solid var(--ink);
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.55;
+}
+.telem-v12-label { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.telem-v12-regime { color: var(--muted); font-size: 11.5px; margin-bottom: 8px; }
+.telem-v12-dom    { margin-top: 8px; }
+.telem-v12-dom-meta { color: var(--muted); font-weight: 400; }
+.telem-v12-sig    { margin-top: 4px; }
+.telem-v12-repair { margin-top: 4px; color: var(--muted); }
+.telem-v12-repair strong, .telem-v12-sig strong { color: var(--ink); }
 .telem-mech h4 {
   margin: 0 0 6px;
   font-size: 13.5px;
