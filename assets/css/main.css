@@ -3192,9 +3192,13 @@ a:hover { border-bottom-color: var(--accent); }
   font-weight: 600;
   font-size: 14px;
 }
-/* Fallback sample button: extra top margin so it reads as an
-   alternate path, not a "step 3" in the upload flow above. */
+/* Fallback sample buttons: stack tight under the "— or —" divider. */
 .telem-sample-btn {
+  margin-top: 8px;
+  text-align: left;
+  font-size: 13px;
+}
+.telem-sample-btn:first-of-type {
   margin-top: 10px;
 }
 .telem-or-divider {

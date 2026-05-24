@@ -543,14 +543,17 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
     document.querySelectorAll("button[data-sample]").forEach(btn => {
       btn.disabled = true;
       btn.addEventListener("click", async () => {
-        const fmt = btn.dataset.sample;
-        setStatus(`Loading sample: ${fmt}.jsonl…`);
-        const resp = await fetch(SAMPLE_BASE + fmt + ".jsonl");
+        const fileBase = btn.dataset.sample;
+        setStatus(`Loading sample: ${fileBase}.jsonl…`);
+        const resp = await fetch(SAMPLE_BASE + fileBase + ".jsonl");
         if (!resp.ok) { setStatus(`Sample not found.`, "error"); return; }
         const text = await resp.text();
-        $("#telem-format").value = fmt;
-        // v1.2: profile dropdown removed; always use code_assistant.
-        await runFromText(text, fmt, "code_assistant");
+        // v1.2: data-sample is the filename; the format is auto-detected
+        // so adding new sample files doesn't require any JS change.
+        const detected = _detectFormat(text) || "claude_code";
+        const fmtSel = $("#telem-format");
+        if (fmtSel) fmtSel.value = detected;
+        await runFromText(text, detected, "code_assistant");
       });
     });
 
