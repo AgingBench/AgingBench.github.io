@@ -3192,14 +3192,24 @@ a:hover { border-bottom-color: var(--accent); }
   font-weight: 600;
   font-size: 14px;
 }
-/* Fallback sample buttons: stack tight under the "— or —" divider. */
+/* Pre-built sample buttons (top of left panel, primary path). */
 .telem-sample-btn {
   margin-top: 8px;
   text-align: left;
   font-size: 13px;
 }
 .telem-sample-btn:first-of-type {
-  margin-top: 10px;
+  margin-top: 4px;
+}
+/* Small section-title above the samples — matches .telem-step h3 style
+   so the visual hierarchy reads consistently across both halves. */
+.telem-section-title {
+  margin: 4px 0 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 .telem-or-divider {
   display: flex;

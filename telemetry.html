@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.14" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.15" />
 </head>
 <body data-page="telemetry">
 
@@ -58,9 +58,29 @@
          (pre-loaded with the canonical sample, replaced on Compute). -->
     <div class="telem-layout">
 
-      <!-- LEFT: provide a trace + format selector -->
+      <!-- LEFT: pre-built samples on top (lowest-friction path) → upload
+           your own JSONL below as a secondary flow. -->
       <div class="telem-panel">
 
+        <!-- Engine status / first-visit hint, kept at the top so users
+             see it before clicking anything. -->
+        <p id="telem-status" class="telem-status">Loading analysis engine…</p>
+        <p class="telem-status-hint">First visit takes ~5–15s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
+
+        <!-- PRIMARY: pre-bundled samples.
+             A: short hiking-CLI demo (~4 sessions, all 4 mechanisms light up)
+             B: short edge case (~6 sessions, interference-dominant)
+             C: Opus-4.7 S7 long run (~29 sessions, revision-dominant)
+             D: SWE-bench sphinx-doc (~8 sessions, cross-domain revision) -->
+        <h3 class="telem-section-title">Try a sample</h3>
+        <button data-sample="claude_code"      class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample A (~4 sessions)</button>
+        <button data-sample="short_edge_case"  class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample B (~6 sessions)</button>
+        <button data-sample="opus47_s7"        class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample C (~29 sessions)</button>
+        <button data-sample="s8_sphinx"        class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample D (~8 sessions)</button>
+
+        <div class="telem-or-divider"><span>or</span></div>
+
+        <!-- SECONDARY: upload your own trace. -->
         <div class="telem-step">
           <h3>1 · Provide a trace</h3>
           <label class="telem-upload-label">
@@ -68,7 +88,7 @@
             <input id="telem-upload" type="file" accept=".jsonl,application/json,text/plain"/>
             <span class="telem-upload-name" id="telem-upload-name">no file chosen</span>
           </label>
-          <p class="telem-hint">No trace handy? See the <a href="#recipes"><code>claude_code</code> recipe below</a> for the one-liner that bundles your local sessions, or just keep the sample card on the right.</p>
+          <p class="telem-hint">No trace handy? See the <a href="#recipes"><code>claude_code</code> recipe below</a> for the one-liner that bundles your local sessions.</p>
         </div>
 
         <div class="telem-step">
@@ -84,14 +104,6 @@
           </div>
           <button id="telem-compute" class="recipe-try telem-compute-btn">▶ Compute AgingCard</button>
         </div>
-
-        <p id="telem-status" class="telem-status">Loading analysis engine…</p>
-        <p class="telem-status-hint">First visit takes ~5–15s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
-        <div class="telem-or-divider"><span>or</span></div>
-        <button data-sample="claude_code"      class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample A (~4 sessions)</button>
-        <button data-sample="short_edge_case"  class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample B (~6 sessions)</button>
-        <button data-sample="opus47_s7"        class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample C (~29 sessions)</button>
-        <button data-sample="s8_sphinx"        class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample D (~8 sessions)</button>
       </div>
 
       <!-- RIGHT: result panel (pre-loaded with the bundled sample on boot,
@@ -202,6 +214,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.14"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.15"></script>
 </body>
 </html>
