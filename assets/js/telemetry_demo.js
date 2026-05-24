@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.0-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.3-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -271,7 +271,6 @@ __telem_out = json.dumps(_safe_floats({
       else if (drift > 0)    s = 1.0;
     }
     if (mech === dominant) s = Math.max(s, 4.0);
-    else if ((coDom || []).indexOf(mech) >= 0) s = Math.max(s, 3.0);
     const filled = Math.max(0, Math.min(5, Math.round(s)));
     return { filled, html: "★".repeat(filled) + "☆".repeat(5 - filled) };
   }
@@ -340,11 +339,6 @@ __telem_out = json.dumps(_safe_floats({
       parts.push(
         `<div class="telem-v12-dom">Dominant mechanism: <strong>${_escapeHtml(top)}</strong>` +
         `<span class="telem-v12-dom-meta"> (score ${scores[top].toFixed(2)}${runnerUp})</span></div>`
-      );
-    } else if (dm.reason === "co_dominant") {
-      parts.push(
-        `<div class="telem-v12-dom">Dominant mechanism: <strong>co-dominant</strong>` +
-        `<span class="telem-v12-dom-meta"> (${(dm.co_dominant || []).map(_escapeHtml).join(" + ")})</span></div>`
       );
     } else if (dm.reason === "no_independent_evidence") {
       parts.push(
