@@ -7,7 +7,7 @@
   <meta name="description" content="Three release modes, a quickstart that actually works, and five plug-and-play tracks for submitting model, memory policy, component, controller, or agent results." />
 
   <meta property="og:title" content="Run AgingBench in 10 minutes" />
-  <meta property="og:description" content="One pip install. Three release modes, AgingCard interop format, four Tier-1 swap-points plus a Tier-2 production-agent track." />
+  <meta property="og:description" content="One pip install. Three release modes, AgingCard interop format, three Tier-1 swap-points plus a Tier-2 production-agent track." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/img/figure1_draft.png" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -193,7 +193,7 @@ print(r.card['headline'])"</pre>
 <section id="tracks" class="section">
   <div class="container">
     <h2 class="section-title">Tier 1 tracks (controlled runner)</h2>
-    <p class="section-lead">Tier 2 is the headline (above). For deeper diagnosis on the controlled <code>ReferenceAgent</code> runner, four Tier 1 swap-points let you isolate one variable at a time. Track A is live today via the SUT YAML; B / C / D are first-class CLI swap-points planned for v1.1 — until then, they're reachable by hand-editing the SUT YAML or subclassing the relevant component. Each track gets its own sub-tab of the <a href="leaderboard.html#track-tier1">Tier 1 leaderboard</a>.</p>
+    <p class="section-lead">Tier 2 is the headline (above). For deeper diagnosis on the controlled <code>ReferenceAgent</code> runner, three Tier 1 swap-points let you isolate one variable at a time. Track A is live today via the SUT YAML; B is live via the same YAML, with a first-class <code>--memory-policy</code> CLI flag planned for v1.1; C is the runtime-controller track and opens with two reference controllers in v1.1. Each track gets its own sub-tab of the <a href="leaderboard.html#track-tier1">Tier 1 leaderboard</a>.</p>
 
     <div class="t1-track-grid">
 
@@ -212,18 +212,12 @@ print(r.card['headline'])"</pre>
 
       <article class="t1-track-card">
         <div class="t1-track-letter">C</div>
-        <h4>Component override <span class="status beta">v1.1 CLI</span></h4>
-        <p>Override one stage of the memory pipeline (<code>𝒲</code> write, <code>ℛ</code> retrieve, <code>𝒰</code> utilize) while leaving the others default. Reachable today by subclassing inside your SUT package.</p>
-      </article>
-
-      <article class="t1-track-card">
-        <div class="t1-track-letter">D</div>
         <h4>Runtime controller <span class="status beta">v1.1 CLI</span></h4>
-        <p>Attach a controller that observes per-session signals and fires interventions (recompact, force-read, promote to typed state). Wired into the runner; first-class <code>--controller</code> flag lands in v1.1.</p>
+        <p>Attach a controller that observes per-session signals and fires interventions (recompact, force-read, promote to typed state). The <code>ThresholdController</code> ABC ships in <code>core/controller.py</code> in v0.3.0; first-class <code>--controller-import-path</code> flag and two reference controllers (lag-recall trigger, accumulator-promotes-to-typed-state) land in v1.1.</p>
       </article>
 
     </div>
-    <p class="muted-line" style="margin-top:18px;">Track E (full Tier-2 agents like Claude Code / OpenHands) is covered above in the <a href="#quickstart">Quickstart</a>. Cross-track comparisons are <strong>not</strong> apples-to-apples by design — the <a href="leaderboard.html">leaderboard</a> keeps tracks in separate tabs so the comparison stays honest.</p>
+    <p class="muted-line" style="margin-top:18px;">Tier 2 (full autonomous agents like Claude Code / OpenHands) is covered above in the <a href="#quickstart">Quickstart</a> and has its own panel on the <a href="leaderboard.html#track-agent">leaderboard</a>. Cross-tier and cross-track comparisons are <strong>not</strong> apples-to-apples by design — the leaderboard keeps each in its own tab so the comparison stays honest.</p>
   </div>
 </section>
 

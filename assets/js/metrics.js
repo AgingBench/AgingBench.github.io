@@ -34,8 +34,8 @@ const METRICS = {
     mechanism: "Interference",
     direction: "higher is better",
     formula: "min(1, |D_t ∩ out(t)| / max(0.3·|D_t|, 1))",
-    description: "Fraction of dependency keywords from the prior sprint's design notes that the agent surfaces in this sprint's output. Saturates at 30% match so partial recall counts.",
-    example: "Prior sprint introduced helper functions {validate_email, normalize_phone, geocode_address}. Current sprint output mentions validate_email and geocode_address \u2192 2/3 = 0.67, normalized to ~1.0 via the saturating bound."
+    description: "Fraction of dependency keywords from the prior sprint's design notes that the agent surfaces in this sprint's output. The 0.3\u00b7|D_t| denominator saturates the score: surfacing at least 30% of the prior keys already yields 1.0; below 30% the score scales linearly with the recall count.",
+    example: "Prior sprint introduced helper functions {validate_email, normalize_phone, geocode_address}, so |D_t|=3. Current sprint output mentions validate_email and geocode_address, so |D_t \u2229 out(t)|=2. Denominator = max(0.3\u00b73, 1) = 1. Raw score = 2/1 = 2, capped at 1.0 by the outer min."
   },
   s6_recall: {
     full: "recall_rate(t)",
@@ -53,7 +53,7 @@ const METRICS = {
     direction: "lower is better",
     formula: "|v_agent(t) − v_gold(t)|",
     description: "Absolute error between the agent's reported running total and the ground-truth value computed from the full delta history. Catches compounding drift that keyword recall would miss.",
-    example: "User adds $50 + $80 + $64 + $30 across 8 sessions on a $1,000 budget. Gold balance = $776. If the agent reports $840, accumulator_error = |840 − 776| = 64."
+    example: "User logs charges of $50 + $80 + $64 + $30 against a $1,000 monthly budget across 8 sessions. Gold balance = 1000 − 224 = $776. If the agent reports $840, accumulator_error = |840 − 776| = 64."
   },
   s7_recall: {
     full: "recall_accuracy(t)",
