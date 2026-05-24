@@ -60,6 +60,7 @@ a:hover { border-bottom-color: var(--accent); }
   padding: 0 28px;
 }
 .container.narrow { max-width: 760px; }
+.container.container-wide { max-width: 1400px; }
 
 /* ============ Header ============ */
 .site-header {
@@ -3160,13 +3161,19 @@ a:hover { border-bottom-color: var(--accent); }
    RIGHT panel (live AgingCard, pre-loaded with the bundled sample). */
 .telem-layout {
   display: grid;
-  grid-template-columns: 420px 1fr;
-  gap: 24px;
+  grid-template-columns: 440px 1fr;
+  gap: 28px;
   margin-top: 18px;
   align-items: start;
 }
 @media (max-width: 980px) {
   .telem-layout { grid-template-columns: 1fr; }
+}
+/* Top-align: kill the legacy margin-top that .telem-result carried
+   from the pre-v1.2 stacked layout. Inside .telem-layout, both
+   columns share the same top so the panel + card visually line up. */
+.telem-layout .telem-result {
+  margin-top: 0;
 }
 .telem-panel {
   background: var(--bg);
