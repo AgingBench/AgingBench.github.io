@@ -52,7 +52,7 @@
 <section id="demo" class="section bg-soft">
   <div class="container container-wide">
     <h2 class="section-title">Try it</h2>
-    <p class="section-lead">Pick a pre-bundled sample, or drop a JSONL trace of your own. Computation runs locally in Pyodide (~10 MB Python WebAssembly runtime, cached on first visit).</p>
+    <p class="section-lead">Pick a pre-bundled sample, or drop a JSONL trace of your own. Computation runs locally in Pyodide (cached on first visit).</p>
 
     <!-- Two-column layout: left = upload setup, right = live AgingCard
          (pre-loaded with the canonical sample, replaced on Compute). -->
@@ -86,7 +86,7 @@
         </div>
 
         <p id="telem-status" class="telem-status">Loading analysis engine…</p>
-        <p class="telem-status-hint">First visit takes ~5–15 s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
+        <p class="telem-status-hint">First visit takes ~5–15s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
         <div class="telem-or-divider"><span>or</span></div>
         <button data-sample="claude_code"      class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample A (~4 sessions)</button>
         <button data-sample="short_edge_case"  class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample B (~6 sessions)</button>
@@ -127,7 +127,7 @@
 <section id="recipes" class="section">
   <div class="container">
     <h2 class="section-title">Get your trace in 60 seconds</h2>
-    <p class="section-lead">Two paths are validated for v0.3.0: the native <code>claude_code</code> session files, and the generic JSONL shape (any custom format you can reshape into <code>session_id</code> + <code>role</code> + <code>content</code> + token fields). Five more adapters ship in the codebase — they parse correctly against our fixture tests, but the extraction recipes haven't been validated against current third-party SDKs. <a href="#other-adapters">See the list below.</a></p>
+    <p class="section-lead">Two paths are validated for v0.3.0. Five more adapters will be extended — they parse correctly against our fixture tests, but the extraction recipes haven't been validated against current third-party SDKs. <a href="#other-adapters">See the list below.</a></p>
 
     <div class="recipe-grid">
 
