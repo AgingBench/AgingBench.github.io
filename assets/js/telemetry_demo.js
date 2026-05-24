@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.8-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.13-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -274,13 +274,19 @@ __telem_out = json.dumps(_safe_floats({
       if (_isDegrading(b.value_supersession_verdict) || _isDegrading(b.violation_trajectory_verdict)) s += 1.0;
       if ((b.n_entities_tracked || 0) >= 5) s += 0.5;
     } else if (mech === "maintenance") {
+      // Base score on per-shock outcome delta (when available) + n_shocks.
       const d = b.median_outcome_rate_delta;
       if (d != null) {
         if (d < -0.15) s += 3.0;
         else if (d < -0.05) s += 1.5;
         else if (d < -0.01) s += 0.5;
       }
-      if (_isDegrading(b.intervention_rate_verdict)) s += 1.5;
+      const ns = b.n_shocks || 0;
+      if (ns >= 5) s += 1.0;
+      else if (ns >= 2) s += 0.5;
+      // Temporal-resilience signal: cumulative shock damage rising over time.
+      if (_isDegrading(b.shock_damage_verdict)) s += 1.5;
+      else if (_isDegrading(b.intervention_rate_verdict)) s += 1.5;
     } else if (mech === "consistency") {
       // 5th sparkline: aging-happened detector. Score by drift magnitude.
       const drift = b.behavior_drift_at_repeat || 0;
@@ -411,8 +417,8 @@ __telem_out = json.dumps(_safe_floats({
                       "per_session_violation_trajectory", "violation_trajectory_slope",
                       "violation_trajectory_verdict", "revision"),
       renderMechanism(audit, "maintenance", "④ Maintenance",
-                      "intervention_rate_trajectory", "intervention_rate_slope",
-                      "intervention_rate_verdict", "maintenance"),
+                      "shock_damage_trajectory", "shock_damage_slope",
+                      "shock_damage_verdict", "maintenance"),
     ].join("");
 
     // v1.2: synthetic-probe sections removed from the demo UI. Functions
