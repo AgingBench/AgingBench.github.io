@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.12" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.13" />
 </head>
 <body data-page="telemetry">
 
@@ -100,9 +100,16 @@
       <div id="telem-meta-pills" class="telem-meta-pills"></div>
 
       <!-- Everything inside #telem-card-snapshot is captured by the
-           Save-as-PNG button. v12 surface + mechanism trajectories +
-           telemetry summary — the screenshot-shareable region. -->
+           Save-as-PNG button. Header + v12 surface + mechanism
+           trajectories + telemetry summary — the screenshot-shareable
+           region. Padding/border on the snapshot div itself so the
+           exported PNG has visual breathing room on all sides. -->
       <div id="telem-card-snapshot">
+        <div class="telem-card-header">
+          <span class="telem-card-icon">🕰️</span>
+          <span class="telem-card-title">Agent Lifespan Report</span>
+        </div>
+
         <!-- v1.2 Lifespan Card surface: behavior_drift / aging_trend label, trace regime,
              dominant-mechanism arbitration, diagnostic signature, recommended repair. -->
         <div id="telem-v12-surface" class="telem-v12-surface" hidden></div>
@@ -200,6 +207,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.12"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.13"></script>
 </body>
 </html>

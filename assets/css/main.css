@@ -3494,6 +3494,33 @@ a:hover { border-bottom-color: var(--accent); }
   font-size: 13px;
   font-weight: 600;
 }
+
+/* v1.2: snapshot region — visually self-contained so the exported
+   PNG has breathing room on every side and looks like a polished
+   shareable card. */
+#telem-card-snapshot {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-top: 4px;
+}
+.telem-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--ink);
+}
+.telem-card-icon { font-size: 28px; line-height: 1; }
+.telem-card-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
 .telem-raw {
   margin-top: 14px;
   border-top: 1px solid var(--line);
