@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.18" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.19" />
 </head>
 <body data-page="telemetry">
 
@@ -140,6 +140,60 @@
       </details>
       </div>  <!-- /#telem-result -->
     </div>  <!-- /.telem-layout -->
+
+    <!-- How-to-read expander: tucked under the setup + AgingCard so it
+         doesn't add visual weight up top, but stays one click away when
+         a user sees the per-mechanism panels for the first time. -->
+    <details class="telem-howto">
+      <summary>How to read the AgingCard <span class="telem-howto-hint">(X / Y / slope / verdict, plus scenarios-mode equivalents)</span></summary>
+      <div class="telem-howto-body">
+
+        <h4>Reading a per-mechanism trajectory</h4>
+        <ul>
+          <li><strong>X-axis</strong> — session index (0 = first session in the trace, increasing left → right). One point per session that produced enough signal to score.</li>
+          <li><strong>Y-axis</strong> — the mechanism's primary structural signal, normalised to <code>[0, 1]</code>. <em>Higher Y is not always worse</em>: each metric has its own polarity, so always read the <strong>verdict</strong> pill rather than the slope sign alone.</li>
+          <li><strong>Slope</strong> — per-session OLS rate (units of Y per session). Tells you the <em>direction and pace</em> of change. Sign meaning depends on the metric: e.g. compression's <code>context_noise_ratio</code> rising = bad; revision's <code>tool_argument_specificity</code> rising = good.</li>
+          <li><strong>Verdict</strong> — saturation-aware enum (<code>healthy</code> / <code>weak</code> / <code>adequate</code> / <code>strong degradation</code> / <code>underpowered</code> / <code>no_test_fired</code>). This is the canonical read; the curve and slope are evidence for it. <code>underpowered</code> = not enough data to score; <code>no_test_fired</code> = the mechanism's structural preconditions never appeared in the trace.</li>
+        </ul>
+
+        <h4>What's the scenarios-mode equivalent?</h4>
+        <p class="telem-howto-note">Telemetry mode does <em>triangulation</em> over the behavioral DAG (tool calls, results, outcomes) — scenarios mode does <em>identification</em> against a gold dependency DAG. The table shows each telemetry signal alongside its scenarios-mode counterpart and how faithful the proxy is.</p>
+        <table class="telem-howto-table">
+          <thead>
+            <tr><th>Mechanism</th><th>Telemetry signal (this card)</th><th>Scenarios-mode equivalent</th><th>Fidelity</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Compression</strong></td>
+              <td><code>context_noise_ratio</code> + <code>tool_argument_specificity</code> + saturation</td>
+              <td><code>m_compression_*</code> — direct recall against a known fact list under forced compression</td>
+              <td>Indirect (necessary conditions + downstream symptoms)</td>
+            </tr>
+            <tr>
+              <td><strong>Interference</strong></td>
+              <td><code>tool_kl</code> + <code>lineage_continuity_drop</code> + embedding <code>anchor_drift</code></td>
+              <td><code>m_interference_mean</code> — probe accuracy on facts inside scripted confusable clusters</td>
+              <td>Indirect (behaviour drift, not collision)</td>
+            </tr>
+            <tr>
+              <td><strong>Revision</strong></td>
+              <td><code>value_supersession</code> / <code>per_session_violation</code> — agent cites a stale value the world already updated</td>
+              <td><code>m_revision_explicit_mean</code> — probe accuracy on the latest version after scripted updates</td>
+              <td>Direct &amp; clean (same operational shape)</td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance</strong></td>
+              <td>Model swap / context drop / cache spike + pre-vs-post outcome delta</td>
+              <td><code>m_maintenance_delta</code> — pre/post probe accuracy across a scripted lifecycle event</td>
+              <td>Direct &amp; clean (same operational shape)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="telem-howto-note">Revision and Maintenance are reported as <em>identification</em> claims when they fire (same operational form as scenarios mode). Compression and Interference are reported as <em>triangulation</em> claims — stacked structural signals that constrain, but don't pinpoint, the mechanism story.</p>
+
+      </div>
+    </details>
+
   </div>
 </section>
 
@@ -214,6 +268,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.18"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.19"></script>
 </body>
 </html>
