@@ -258,6 +258,14 @@ __telem_out = json.dumps(_safe_floats({
         else if (d < -0.01) s += 0.5;
       }
       if (_isDegrading(b.intervention_rate_verdict)) s += 1.5;
+    } else if (mech === "consistency") {
+      // 5th sparkline: aging-happened detector. Score by drift magnitude.
+      const drift = b.behavior_drift_at_repeat || 0;
+      if (drift > 0.5)       s = 5.0;
+      else if (drift > 0.3)  s = 4.0;
+      else if (drift > 0.15) s = 3.0;
+      else if (drift > 0.05) s = 2.0;
+      else if (drift > 0)    s = 1.0;
     }
     if (mech === dominant) s = Math.max(s, 4.0);
     else if ((coDom || []).indexOf(mech) >= 0) s = Math.max(s, 3.0);
