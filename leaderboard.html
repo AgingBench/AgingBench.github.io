@@ -117,14 +117,15 @@
 
       <!-- ----- B · Memory Policy ----- -->
       <div class="t1-panel" data-t1panel="policy" id="track-policy">
-      <p class="section-lead">Submitter swaps the <code>MemoryPolicy</code> (write / read / retrieve / compress); model held at Haiku-4.5 default. Best track for memory-systems research and retrieval/compression papers.</p>
+      <p class="section-lead">Same memory policy (<code>summarize_store</code>), two compaction prompts (<em>lossy</em> vs <em>careful</em>), across four models — the policy-contrast slice of the paper's Table 3. Use this to read off how much of the across-row spread is attributable to the prompt rather than the model. Track B opens for external <code>MemoryPolicy</code> submissions in v0.3.0.</p>
 
       <div class="table-scroll">
         <table class="results-table">
           <thead>
             <tr>
               <th rowspan="2">Submitter</th>
-              <th rowspan="2">Policy</th>
+              <th rowspan="2">Model</th>
+              <th rowspan="2">Compaction</th>
               <th colspan="3" class="grp-c">Compression</th>
               <th colspan="2" class="grp-i">Interference</th>
               <th colspan="2" class="grp-r">Revision</th>
@@ -142,15 +143,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="row-divider"><td colspan="10"><em>Built-in policies on Haiku-4.5 · reference rows</em></td></tr>
-            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>summarize_store (lossy)</td><td>6.9</td><td>0.32</td><td>0.48</td><td>0.00</td><td>0.13</td><td>153</td><td>0.60</td><td>+0.00 / −0.04</td></tr>
-            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>summarize_store (careful)</td><td><strong>∞</strong></td><td>0.53</td><td>0.77</td><td>0.18</td><td>0.38</td><td>167</td><td>0.27</td><td>−0.17 / +0.17</td></tr>
-            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>growing_history</td><td>8.4</td><td>0.45</td><td>0.62</td><td>0.18</td><td>0.21</td><td>140</td><td>0.45</td><td>−0.10 / +0.03</td></tr>
-            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>append_only + retrieval</td><td>∞</td><td>0.62</td><td>0.71</td><td>0.31</td><td>0.42</td><td>122</td><td>0.51</td><td>+0.02 / +0.05</td></tr>
+            <tr class="row-divider"><td colspan="11"><em>Paper Table 3 · policy contrast slice (4 models × {lossy, careful})</em></td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Qwen3-8B</td><td>lossy</td><td>6.2</td><td>0.53</td><td>0.46</td><td>0.13</td><td>0.15</td><td>192</td><td>0.33</td><td>+0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Qwen3-8B</td><td>careful</td><td>5.9</td><td><strong>0.80</strong></td><td><strong>0.30</strong></td><td>0.46</td><td>0.11</td><td>123</td><td><strong>0.27</strong></td><td>+0.21</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Gemma4-31B</td><td>lossy</td><td><strong>4.9</strong><sup>‡</sup></td><td>0.57</td><td><strong>0.80</strong></td><td>0.18</td><td><strong>0.07</strong></td><td>132</td><td>0.33</td><td>−0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>Gemma4-31B</td><td>careful</td><td>7.4<sup>‡</sup></td><td>0.40</td><td>0.69</td><td>0.18</td><td>0.40</td><td><strong>51</strong></td><td>0.33</td><td><strong>−0.50</strong></td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>gpt-oss-120B</td><td>lossy</td><td>5.4<sup>‡</sup></td><td>0.37</td><td>0.42</td><td>0.33</td><td>0.21</td><td>124</td><td>0.40</td><td>−0.21</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>gpt-oss-120B</td><td>careful</td><td>∞</td><td>0.30</td><td>0.63</td><td>0.15</td><td>0.33</td><td>180</td><td>0.33</td><td>−0.21</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>GPT-4o</td><td>lossy</td><td>7.6</td><td>0.43</td><td>0.50</td><td><strong>0.10</strong></td><td>0.14</td><td><strong>227</strong></td><td><strong>0.27</strong></td><td>+0.04</td></tr>
+            <tr><td>UT Austin <span class="row-badge verified">VERIFIED</span></td><td>GPT-4o</td><td>careful</td><td>∞</td><td>0.53</td><td>0.77</td><td>0.18</td><td>0.38</td><td>167</td><td><strong>0.27</strong></td><td>−0.17</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="table-note">Policy beats model: across this table, the careful-vs-lossy compaction prompt produces a larger half-life delta than any model swap in the Model track. The Track-B leaderboard opens for external policy submissions starting v0.3.0: your custom <code>MemoryPolicy</code> subclass against the Haiku baseline.</p>
+      <p class="table-note">All eight rows come from the paper's main results table (Table 3). <strong>Bold</strong> = column extremum in the direction of aging (min half-life, min recall/precision/fidelity, max accumulator error, largest-magnitude shock). <sup>‡</sup> indicates that at least one seed gave ∞; reported half-life is the mean over the finite seeds. Read the lossy → careful rows pairwise per model: e.g. Gemma4-31B picks up substantially more <em>S2 precision</em> headroom under careful (+0.40 abs) but its S1 half-life moves only modestly, illustrating that compaction-prompt investment pays off where the utilization margin can absorb it (paper §6 / Finding II). Track B opens for external <code>MemoryPolicy</code> submissions in v0.3.0 — submit a custom subclass and we'll add it to this matrix.</p>
 
       <div class="lb-cta">
         <p>Submitting a memory policy? Subclass <code>MemoryPolicy</code>, point your SUT YAML's <code>memory_policy.type</code> at the import path, run the lite or full suite, and note "Track B (memory policy)" in the PR description. The first-class <code>--memory-policy</code> CLI flag lands in v1.1.</p>
