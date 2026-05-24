@@ -3365,8 +3365,8 @@ a:hover { border-bottom-color: var(--accent); }
   vertical-align: middle;
 }
 .telem-mech-stars {
-  font-family: var(--mono); font-size: 14px; letter-spacing: 2px;
-  color: var(--ink); margin: 2px 0 6px;
+  font-family: var(--mono); font-size: 22px; letter-spacing: 3px;
+  color: var(--ink); margin: 4px 0 8px;
 }
 
 /* v1.2 Lifespan Card surface (headline label + regime + dominant + signature + repair) */

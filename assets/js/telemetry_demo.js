@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.4-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.5-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -401,8 +401,8 @@ __telem_out = json.dumps(_safe_floats({
                       "intervention_rate_verdict", "maintenance"),
     ].join("");
 
-    renderProbes(card);
-    surfaceAugmentPanel(out);
+    // v1.2: synthetic-probe sections removed from the demo UI. Functions
+    // below are no-ops when their target DOM elements are absent.
 
     $("#telem-raw-json").textContent = lastCardJSON;
     $("#telem-result").scrollIntoView({behavior: "smooth", block: "start"});
