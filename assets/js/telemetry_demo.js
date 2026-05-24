@@ -30,7 +30,10 @@
 
   const PYODIDE_VERSION = "0.26.4";
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
-  const BUNDLE_URL = "assets/wasm/agingbench-telemetry.tar.gz";
+  // Cache-bust on bundle version so browsers don't serve a stale archive
+  // after a bundle rebuild. Bump this when the bundle contents change.
+  const BUNDLE_VERSION = "v1.2.0-2026-05-24";
+  const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
   let pyodide = null;
