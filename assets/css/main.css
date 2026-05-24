@@ -3542,12 +3542,15 @@ a:hover { border-bottom-color: var(--accent); }
   overflow-y: auto;
 }
 
-/* ─── How-to-read expander (telemetry demo, below setup + AgingCard) ─── */
+/* ─── How-to-read expander (telemetry demo, below setup + AgingCard) ───
+   Matches the .telem-result AgingCard surface: same background, solid
+   border, padding, and radius — so it reads as a sibling card rather
+   than a secondary aside. */
 .telem-howto {
   margin-top: 28px;
-  padding: 14px 20px;
-  background: var(--bg-soft);
-  border: 1px dashed var(--line);
+  padding: 20px 26px;
+  background: var(--bg);
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
 }
 .telem-howto > summary {
