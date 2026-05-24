@@ -634,14 +634,11 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
       });
     }
 
-    // v1.2: Share on X — render the card to PNG, copy it to the clipboard
-    // (so the user can paste into the tweet composer with Cmd/Ctrl+V),
-    // then open the tweet intent in a new tab with pre-filled text.
-    // X / Twitter's web intent URL does NOT support attaching images via
-    // parameters; clipboard is the only path on a static site.
+    // v1.2: Share on X — open Twitter's web intent with a pre-filled tweet
+    // built from the current card's headline + dominant mechanism.
     const shareX = $("#telem-share-twitter");
     if (shareX) {
-      shareX.addEventListener("click", async () => {
+      shareX.addEventListener("click", () => {
         if (!lastResult) return;
         const audit = (lastResult.card && lastResult.card.trace_audit) || {};
         const hb = audit.headline || {};
@@ -656,51 +653,12 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
         lines.push("Check yours @ AgingBench Lifespan Check");
         const text = lines.join("\n");
         const url  = "https://agingbench.github.io/telemetry.html";
-
-        // Step 1: try to copy the rendered PNG to the clipboard. On
-        // failure (browser doesn't support image clipboard, render error,
-        // or user denies permission), fall back to just opening the
-        // tweet intent — they can paste a manually-saved PNG.
-        const target = document.getElementById("telem-card-snapshot");
-        let clipboardOk = false;
-        if (target && navigator.clipboard && window.ClipboardItem) {
-          const originalText = shareX.textContent;
-          shareX.disabled = true;
-          shareX.textContent = "Rendering…";
-          try {
-            const lib = await _loadHtmlToImage();
-            const blob = await lib.toBlob(target, {
-              backgroundColor: getComputedStyle(document.body).getPropertyValue("--bg") || "#ffffff",
-              pixelRatio: 2,
-            });
-            if (blob) {
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
-              clipboardOk = true;
-            }
-          } catch (err) {
-            console.warn("Clipboard write failed; falling back to text-only share:", err);
-          } finally {
-            shareX.disabled = false;
-            shareX.textContent = originalText;
-          }
-        }
-
-        // Step 2: open the tweet composer in a new tab.
         const intent =
           "https://twitter.com/intent/tweet" +
           "?text=" + encodeURIComponent(text) +
           "&url="  + encodeURIComponent(url)  +
           "&hashtags=" + encodeURIComponent("AgingBench,AgentLifespan");
         window.open(intent, "_blank", "noopener,noreferrer");
-
-        // Step 3: tell the user what just happened.
-        if (clipboardOk) {
-          setStatus("Card image copied to clipboard — paste it into your tweet (Cmd/Ctrl+V).", "ready");
-        } else {
-          setStatus("Tweet composer opened. Click 📸 Save as PNG first to attach the card image.", "ready");
-        }
       });
     }
 
