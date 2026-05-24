@@ -281,6 +281,28 @@ __telem_out = json.dumps(_safe_floats({
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  // ─── v1.2: auto-detect trace adapter format from the first JSON event ───
+  // Returns "claude_code" if Claude Code markers are present (sessionId +
+  // parentUuid or promptId), null otherwise (caller keeps current dropdown).
+  function _detectFormat(jsonlText) {
+    if (!jsonlText) return null;
+    const nl = jsonlText.indexOf("\n");
+    const firstLine = (nl > 0 ? jsonlText.slice(0, nl) : jsonlText).trim();
+    if (!firstLine) return null;
+    try {
+      const ev = JSON.parse(firstLine);
+      // Claude Code: emits sessionId + parentUuid/promptId on most events
+      if (ev && ev.sessionId && (ev.parentUuid !== undefined || ev.promptId !== undefined)) {
+        return "claude_code";
+      }
+      // Type-based fallback (queue-operation / assistant / user with message)
+      if (ev && ev.sessionId && typeof ev.type === "string") {
+        return "claude_code";
+      }
+    } catch (_) { /* malformed first line — give up gracefully */ }
+    return null;
+  }
+
   // ─── v1.2: render the Lifespan Card surface (headline + dominant + signature + repair) ───
   function renderTelemetryV12CardSurface(audit) {
     const surface = document.getElementById("telem-v12-surface");
@@ -527,6 +549,18 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
         const text = await file.text();
         $("#telem-upload-name").textContent = file.name;
         upload.dataset.payload = text;
+        // v1.2: auto-detect adapter format from the first event so the user
+        // doesn't have to remember to change the dropdown after upload.
+        // Heuristic: Claude Code events carry sessionId + parentUuid /
+        // promptId. Anything else falls back to generic.
+        const detected = _detectFormat(text);
+        if (detected) {
+          const fmtSel = $("#telem-format");
+          if (fmtSel && fmtSel.value !== detected) {
+            fmtSel.value = detected;
+            setStatus(`Detected format: ${detected} — dropdown updated.`, "ready");
+          }
+        }
       });
     }
 
