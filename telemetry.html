@@ -99,30 +99,10 @@
            dominant-mechanism arbitration, diagnostic signature, recommended repair. -->
       <div id="telem-v12-surface" class="telem-v12-surface" hidden></div>
 
-      <h3>Headline <span class="muted" style="font-weight:400;font-size:0.85em;">(hover any cell for what it means)</span></h3>
-      <div class="telem-headline-grid">
-        <div title="Headline score at the LAST session in the trace. 1.0 = no measurable degradation; 0 = total collapse.">
-          <span>m_final</span>     <strong data-headline-field="m_final"></strong>
-          <small class="telem-metric-hint">score at last session (1=perfect, 0=collapsed)</small>
-        </div>
-        <div title="Number of sessions for the score to fall to 50% of its starting value (m0). ∞ means it never reached that threshold in this trace.">
-          <span>half_life</span>   <strong data-headline-field="half_life"></strong>
-          <small class="telem-metric-hint">sessions to drop to 50% (∞ = never)</small>
-        </div>
-        <div title="Per-session linear slope. -0.05 ≈ losing 5% per session; positive means the agent improved over the trace (rare).">
-          <span>decay_slope</span> <strong data-headline-field="decay_slope"></strong>
-          <small class="telem-metric-hint">per-session change (− means aging)</small>
-        </div>
-        <div title="Boolean. True when decay_slope &lt; -0.01 OR (m0 − m_final)/m0 ≥ 0.10. Set by aging_card.py heuristic.">
-          <span>aging detected</span><strong data-headline-field="aging_detected"></strong>
-          <small class="telem-metric-hint">slope &lt; −0.01 or ≥10% drop</small>
-        </div>
-      </div>
-
       <h3>Per-mechanism trajectories</h3>
       <div id="telem-mech-grid" class="telem-mech-grid"></div>
 
-      <h3>Cost &amp; efficiency</h3>
+      <h3>Telemetry summary</h3>
       <div id="telem-cost-block" class="telem-cost-block"></div>
 
       <!-- Merged-probe display (hidden until a probe card is dropped) -->

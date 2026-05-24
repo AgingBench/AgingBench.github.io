@@ -3331,6 +3331,13 @@ a:hover { border-bottom-color: var(--accent); }
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+/* v1.2: aging-detected coloring inside Telemetry summary */
+.telem-cost-block strong.telem-aging-yes {
+  color: var(--m-revision);
+}
+.telem-cost-block strong.telem-aging-no {
+  color: var(--muted);
+}
 
 .telem-mech-grid {
   display: grid;

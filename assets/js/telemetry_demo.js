@@ -32,7 +32,7 @@
   const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
   // Cache-bust on bundle version so browsers don't serve a stale archive
   // after a bundle rebuild. Bump this when the bundle contents change.
-  const BUNDLE_VERSION = "v1.2.3-2026-05-24";
+  const BUNDLE_VERSION = "v1.2.4-2026-05-24";
   const BUNDLE_URL = `assets/wasm/agingbench-telemetry.tar.gz?v=${BUNDLE_VERSION}`;
   const SAMPLE_BASE = "assets/sample_traces/";
 
@@ -170,17 +170,23 @@ __telem_out = json.dumps(_safe_floats({
     });
   }
 
+  // v1.2: "Telemetry summary" — replaces the older Cost & efficiency block.
+  // Surfaces aging-detected (moved here from the dropped Headline section)
+  // alongside the cost/efficiency aggregates so users see one bottom-of-card
+  // summary strip.
   function renderCost(card) {
     const c = card.cost_and_efficiency || {};
+    const h = card.headline || {};
     const block = $("#telem-cost-block");
     if (!block) return;
+    const agingDetected = h.aging_detected == null ? "—" : (h.aging_detected ? "yes" : "no");
+    const agingClass = h.aging_detected === true ? "telem-aging-yes"
+                    : h.aging_detected === false ? "telem-aging-no" : "";
     block.innerHTML = `
+      <div title="Boolean. True when decay_slope < -0.01 OR (m0 − m_final)/m0 ≥ 0.10. Set by aging_card.py heuristic."><span>aging detected</span><strong class="${agingClass}">${agingDetected}</strong></div>
       <div><span>input tokens</span><strong>${fmt(c.total_input_tokens)}</strong></div>
       <div><span>output tokens</span><strong>${fmt(c.total_output_tokens)}</strong></div>
       <div><span>tokens / session</span><strong>${fmt(c.tokens_per_session_mean)}</strong></div>
-      <div><span>total cost</span><strong>${fmtMoney(c.total_cost_usd)}</strong></div>
-      <div><span>p50 latency</span><strong>${c.latency_ms_p50 == null ? "—" : c.latency_ms_p50 + " ms"}</strong></div>
-      <div><span>p95 latency</span><strong>${c.latency_ms_p95 == null ? "—" : c.latency_ms_p95 + " ms"}</strong></div>
     `;
   }
 
@@ -372,17 +378,15 @@ __telem_out = json.dumps(_safe_floats({
       <span>profile: <strong>${out.profile_used}</strong></span>
     `;
 
-    renderHeadline(card);
+    // v1.2: Headline section removed from the page; the v12 surface strip
+    // already shows the headline label / aging trend / etc.
     renderCost(card);
 
     const audit = card.trace_audit || {};
     renderTelemetryV12CardSurface(audit);
+    // v1.2: 4 mechanism sparklines only (consistency is summarised in the
+    // v12 surface strip above; rendering a 5th sparkline duplicated info).
     $("#telem-mech-grid").innerHTML = [
-      // v1.2: consistency is the load-bearing "aging-happened" detector,
-      // rendered first as the 5th-and-largest sparkline.
-      renderMechanism(audit, "consistency",  "⓪ Consistency",
-                      "consistency_drop_trajectory", "consistency_drop_slope",
-                      "consistency_drop_verdict", "consistency"),
       renderMechanism(audit, "compression",  "① Compression",
                       "context_noise_ratio_trajectory", "context_noise_slope",
                       "context_noise_verdict", "compression"),
