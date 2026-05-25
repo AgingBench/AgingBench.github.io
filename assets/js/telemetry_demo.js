@@ -657,7 +657,12 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
         lines.push("");
         lines.push("Check yours @ AgingBench Lifespan Check");
         const text = lines.join("\n");
-        const url  = "https://agingbench.github.io/telemetry.html";
+        // Use the current page URL so the share works regardless of which
+        // domain / org the site is served from. Falls back to the canonical
+        // GitHub Pages URL if window.location is somehow unavailable.
+        const url  = (typeof window !== "undefined" && window.location)
+          ? (window.location.origin + window.location.pathname)
+          : "https://agingbench.github.io/telemetry.html";
         const intent =
           "https://twitter.com/intent/tweet" +
           "?text=" + encodeURIComponent(text) +
