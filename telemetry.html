@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.27" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.28" />
 </head>
 <body data-page="telemetry">
 
@@ -68,10 +68,10 @@
         <p class="telem-status-hint">First visit takes ~5–15s while Pyodide and the AgingBench bundle download (~10 MB total). Cached in your browser after — subsequent loads are &lt;1 s.</p>
 
         <!-- PRIMARY: pre-bundled samples.
-             A: short hiking-CLI demo (~4 sessions, all 4 mechanisms light up)
-             B: short edge case (~6 sessions, interference-dominant)
-             C: Opus-4.7 S7 long run (~29 sessions, revision-dominant)
-             D: SWE-bench sphinx-doc (~8 sessions, cross-domain revision) -->
+             A: short hiking-CLI demo (~4 sessions, all 4 mechanisms light up; revision-dominant)
+             B: short edge case (~6 sessions, maintenance-dominant via shock_damage)
+             C: Opus-4.7 S7 long run (~29 sessions, revision-dominant; maintenance co-saturated)
+             D: SWE-bench sphinx-doc (~8 sessions, revision-dominant; maintenance co-saturated) -->
         <h3 class="telem-section-title">Try a sample</h3>
         <button data-sample="claude_code"      class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample A (~4 sessions)</button>
         <button data-sample="short_edge_case"  class="recipe-try telem-compute-btn telem-sample-btn">▶ Try sample B (~6 sessions)</button>
@@ -183,7 +183,7 @@
             </tr>
             <tr>
               <td><strong>Maintenance</strong></td>
-              <td>Model swap / context drop / cache spike + pre-vs-post outcome delta</td>
+              <td>Detect lifecycle shocks (model swap, context drop, cache spike, system change) and measure pre-vs-post damage at each one. The sparkline shows <code>shock_damage_trajectory</code> — cumulative damage per session.</td>
               <td><code>m_maintenance_delta</code> — pre/post probe accuracy across a scripted lifecycle event</td>
               <td>Direct &amp; clean (same operational shape)</td>
             </tr>
@@ -268,6 +268,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.27"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.28"></script>
 </body>
 </html>

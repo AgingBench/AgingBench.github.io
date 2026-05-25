@@ -329,7 +329,7 @@ r = trace_to_card_v11(
         <tr><td><code>compression</code></td><td>saturation rate (<code>input_tokens / ctx_window</code>), context-noise ratio trajectory, tool-argument specificity slope (P3)</td><td><code>compression.py</code></td></tr>
         <tr><td><code>interference</code></td><td>tool-name KL divergence vs early-session baseline, embedding-based goal-anchor drift (P2), tool-result lineage continuity (P4)</td><td><code>interference.py</code></td></tr>
         <tr><td><code>revision</code></td><td>tool-result update propagation (P1) with a three-tier fallback — see next subsection</td><td><code>revision.py</code></td></tr>
-        <tr><td><code>maintenance</code></td><td>lifecycle shock detection (model swap, ctx drop, cache spike, system change) + pre/post latency or outcome delta</td><td><code>maintenance.py</code></td></tr>
+        <tr><td><code>maintenance</code></td><td>lifecycle shock detection (model swap, ctx drop, cache spike, system change, /clear command) + cumulative <code>shock_damage_trajectory</code>: damage magnitude per shock uses a 3-tier preference — outcome_rate_delta (when outcomes linked) → avg_response_tokens_delta/100 (universal) → latency_p50_delta_ms/1000 (when duration_ms present)</td><td><code>maintenance.py</code></td></tr>
       </tbody>
     </table>
 
@@ -369,14 +369,15 @@ r = trace_to_card_v11(
     <p>A pure-Python card renderer (<code>card_render.render_card_ascii(trace_audit)</code>) produces the rich-format ASCII card shown in the demo and used by the website's <code>📸 Save as PNG</code> action.</p>
 
     <h3 class="subsection">Headline policy (outcome-free by default)</h3>
-    <p>The card's top-line "how fast is this aging" metric is selected dynamically based on what the trace carries — four tiers tried in order:</p>
+    <p>The card's top-line "how fast is this aging" metric is selected dynamically based on what the trace carries — tiers tried in order:</p>
     <ol>
       <li><code>half_life</code> — when <code>OutcomeEvent</code>s are present (or an extractor fires)</li>
       <li><code>behavior_drift_at_repeat</code> — when ≥ 1 repeat-task cluster is detected (each cluster ≥ 2 occurrences)</li>
-      <li><code>aging_trend</code> — when the aggregate per-session severity sum across the four mechanism blocks is monotonically rising over ≥ 3 sessions</li>
+      <li><code>aging_trend</code> — when the aggregate per-session severity sum across the four mechanism blocks is monotonically rising over ≥ 3 sessions (the aggregate now includes the per-session diff of <code>shock_damage_trajectory</code>)</li>
+      <li><code>maintenance_shock_damage</code> — when the maintenance block's cumulative shock-damage signal is rising and ≥ 3 shocks fired. Catches front-loaded shock patterns whose per-session-delta trend doesn't qualify for tier 3</li>
       <li><code>not_measurable</code> — when none of the above apply</li>
     </ol>
-    <p>The <code>headline.source</code> field carries the chosen tier. <code>headline.aging_detected</code> is true when the chosen signal exceeds a meaningful threshold (decay slope &lt; −0.01, or behavior drift &gt; 10%, or aging trend slope &gt; 0.01).</p>
+    <p>The <code>headline.source</code> field carries the chosen tier. <code>headline.aging_detected</code> is true when the chosen signal exceeds a meaningful threshold (decay slope &lt; −0.01, m0→m_final drop ≥ 10%, behavior drift &gt; 10%, aging trend slope &gt; 0.01, OR <code>shock_damage_verdict == rising_degradation</code> with n_shocks ≥ 3). The shock-damage clause fires regardless of which tier produced the headline label, so a trace whose dominant aging is maintenance-driven flags <code>aging_detected: true</code> even when the headline label is — for example — a behavior-drift number from tier 2.</p>
 
     <h3 class="subsection">Coverage + trajectory verdicts</h3>
     <p>Every per-mechanism inference block carries two verdict strings so a low score can never be confused with "agent didn't age." The full enum:</p>
