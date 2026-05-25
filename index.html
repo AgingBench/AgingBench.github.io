@@ -49,7 +49,7 @@
 <section class="hero">
   <div class="container">
     <h1 class="hero-title"><i class="fa fa-hourglass-half" style="color:#b54a2b;"></i>  Your Agents Are <em>Aging</em> Too:<br/><span class="accent">Agent Lifespan Engineering for Deployed Systems</span></h1>
-    <p class="hero-tagline">AI agents have lifespans, <i>AgingBench</i> measures them - a longitudinal reliability foundation for agent lifespan engineering.</p>
+    <p class="hero-tagline">AI agents have lifespans, <i>AgingBench</i> measures them — a longitudinal reliability foundation for agent lifespan engineering.</p>
 
     <div class="pub-authors">
       <a href="https://zfancy.github.io" target="_blank" rel="noopener">Jianing Zhu</a><sup>*</sup>,
@@ -344,7 +344,7 @@
 <section id="diagnosis" class="section">
   <div class="container">
     <h2 class="section-title">③ Where should repair target? Component-level diagnosis</h2>
-    <p class="section-lead" style="margin:0 0 32px;">Knowing <em>how long</em> and <em>how</em> a system tends to decay is not yet enough to act on. The third ALE question asks <em>where</em> in the memory pipeline a failure is consistent with — the candidate repair site. AgingBench instruments the four pipeline components (<strong>𝒲</strong> write, <strong>𝒮</strong> store, <strong>ℛ</strong> retrieve, <strong>𝒰</strong> utilize) and uses paired counterfactual probes that swap each component with an oracle to surface a stage-level diagnostic profile.</p>
+    <p class="section-lead" style="margin:0 0 32px;">Knowing <em>how long</em> and <em>how</em> a system tends to decay is not yet enough to act on. The third ALE question asks <em>where</em> in the memory pipeline a failure originates — the candidate repair site. AgingBench instruments the four pipeline components (<strong>𝒲</strong> write, <strong>𝒮</strong> store, <strong>ℛ</strong> retrieve, <strong>𝒰</strong> utilize) and uses paired counterfactual probes that swap each component with an oracle to surface a stage-level diagnostic profile.</p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 36px; align-items: start;">
       <div>
@@ -359,7 +359,7 @@
 
       <div>
         <h3 class="subsection" style="margin: 0 0 12px; font-family: var(--serif); font-size: 22px; letter-spacing: -0.01em;">Same wrong answer, different repairs</h3>
-        <p style="margin: 0 0 16px; color: var(--ink); font-size: 14.5px; line-height: 1.6;">Aggregate failure rates can look nearly identical across scenarios while the underlying stage-level profile differ. Two systems with the same accuracy can point to different repair targets.</p>
+        <p style="margin: 0 0 16px; color: var(--ink); font-size: 14.5px; line-height: 1.6;">Aggregate failure rates can look nearly identical across scenarios while the underlying stage-level profiles differ. Two systems with the same accuracy can point to different repair targets.</p>
         <figure class="intuition-figure" style="margin: 0;">
           <img class="zoomable" data-zoomable src="assets/img/analysis/diagnostic_fingerprint_v3.png"
                alt="Aging attribution fingerprint across three models and three scenarios; Write/Retrieval/Utilization decomposition."/>
