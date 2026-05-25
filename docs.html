@@ -214,12 +214,12 @@
     <h3 class="subsection">Memory loci</h3>
     <p>The agent is represented as a cyclic dataflow over a memory store, decomposed into four explicit components (paper §4.1):</p>
     <ul>
-      <li><strong>𝒲 — Write / compression policy</strong>. Transforms the current session history into a persistent format saved in the store. Governed by a memory policy <em>θ</em> that is lossy in most production agents (append-only, summarisation, compaction).</li>
+      <li><strong>𝒲 — Write / compression policy</strong>. Transforms the current session history into a persistent format saved in the store. Governed by a memory policy <em>θ</em> that is lossy in most production agents (append-only, summarization, compaction).</li>
       <li><strong>𝒮 — Memory store</strong>. The persistent artifact that holds data across sessions. Mutated by maintenance events (flush, recompact, model swap).</li>
       <li><strong>ℛ — Read / retrieval algorithm</strong>. Queries the store to extract the working context for the current task (last-<em>k</em> by recency, top-<em>k</em> cosine, etc.).</li>
-      <li><strong>𝒰 — Utilization logic</strong>. The LLM's reasoning loop — when to retrieve, what to query, how much context to request, how to synthesise the retrieved context into a response.</li>
+      <li><strong>𝒰 — Utilization logic</strong>. The LLM's reasoning loop — when to retrieve, what to query, how much context to request, how to synthesize the retrieved context into a response.</li>
     </ul>
-    <p>Each aging mechanism has a primary stage: <span class="highlight-pill compression">compression</span> stresses 𝒲, <span class="highlight-pill interference">interference</span> stresses ℛ, <span class="highlight-pill revision">revision</span> stresses 𝒰, and <span class="highlight-pill maintenance">maintenance</span> stresses 𝒮 (external operations mutate the store outside the read–write–utilize execution loop). Localising the error site directly guides mitigation.</p>
+    <p>Each aging mechanism has a primary stage: <span class="highlight-pill compression">compression</span> stresses 𝒲, <span class="highlight-pill interference">interference</span> stresses ℛ, <span class="highlight-pill revision">revision</span> stresses 𝒰, and <span class="highlight-pill maintenance">maintenance</span> stresses 𝒮 (external operations mutate the store outside the read–write–utilize execution loop). Localizing the error site directly guides mitigation.</p>
 
     <figure class="figure narrow">
       <img src="assets/img/dataflow.png" alt="Memory pipeline dataflow with attribution components" />
@@ -230,11 +230,11 @@
     <p>Each probe replaces selected upstream components with oracle implementations; the resulting accuracy gaps <strong>point to the first non-oracle component that is consistent with the failure</strong>. The probes form an ablation ladder over the pipeline:</p>
 
     <div class="attr-flow">
-      <div class="attr-step"><div class="attr-num">1</div><h4>P<sub>1</sub></h4><p>Baseline execution. Agent uses its own write, retrieval, and utilisation logic. Measures <code>Acc<sub>P1</sub></code>.</p></div>
+      <div class="attr-step"><div class="attr-num">1</div><h4>P<sub>1</sub></h4><p>Baseline execution. Agent uses its own write, retrieval, and utilization logic. Measures <code>Acc<sub>P1</sub></code>.</p></div>
       <div class="attr-arrow" aria-hidden="true"></div>
       <div class="attr-step"><div class="attr-num">2</div><h4>P<sub>2</sub></h4><p>Oracle retrieval. Bypass ℛ — oracle extracts required facts from the agent's actual store and injects them into the prompt. Measures <code>Acc<sub>P2</sub></code>.</p></div>
       <div class="attr-arrow" aria-hidden="true"></div>
-      <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error points to utilisation.</p></div>
+      <div class="attr-step"><div class="attr-num">3</div><h4>P<sub>3</sub></h4><p>Oracle context. Bypass 𝒲 + ℛ — gold facts injected directly into the prompt. Measures <code>Acc<sub>P3</sub></code>. Any remaining error points to utilization.</p></div>
     </div>
 
     <table class="cost-table" style="margin: 18px auto 0; max-width:560px;">
@@ -251,7 +251,7 @@
     <h3 class="subsection">Stage-level diagnostic profile</h3>
     <p>Within this conceptual pipeline decomposition, the P<sub>1</sub>/P<sub>2</sub>/P<sub>3</sub> ladder <strong>additively accounts for</strong> the end-to-end error across the Write, Retrieval, and Utilization stages, yielding a <strong>stage-level diagnostic profile</strong> rather than a unique causal decomposition for every architecture. The three shares are read as <em>candidate failure stages</em>:</p>
     <ul>
-      <li><strong>Utilisation share</strong> = <code>1 − Acc<sub>P3</sub></code> → consistent with a <span class="highlight-pill revision">revision-aging signature</span> (𝒰): the model fails despite a perfect context.</li>
+      <li><strong>Utilization share</strong> = <code>1 − Acc<sub>P3</sub></code> → consistent with a <span class="highlight-pill revision">revision-aging signature</span> (𝒰): the model fails despite a perfect context.</li>
       <li><strong>Write share</strong> = <code>Acc<sub>P3</sub> − Acc<sub>P2</sub></code> → pointing to a <span class="highlight-pill compression">compression-aging signature</span> (𝒲): information was already underspecified at write time.</li>
       <li><strong>Read share</strong> = <code>Acc<sub>P2</sub> − Acc<sub>P1</sub></code> → consistent with an <span class="highlight-pill interference">interference-aging signature</span> (ℛ): facts in the store but retrieval failed to fetch them.</li>
     </ul>
@@ -274,7 +274,7 @@
     <p class="section-lead"><a href="telemetry.html">Telemetry mode</a> is the inverse of scenario mode: instead of running constructed probes against your model, it parses a JSONL trace your deployed agent has already produced and infers per-mechanism aging signals from the trace's <em>behavioral DAG</em> — the graph formed by tool calls (names + args), tool results, session boundaries, lifecycle events, and timestamps. This page documents the current telemetry-mode API; recipe cards for each format live on the <a href="telemetry.html#recipes">telemetry page</a>.</p>
 
     <h3 class="subsection">Supported trace formats</h3>
-    <p>Seven adapters ship in <code>agingbench/telemetry/adapters/</code>. Each normalises its native trace shape into a canonical <code>TelemetryRecord</code> stream that downstream inference consumes format-agnostically. Adapters all pass fixture-level parse tests; the <em>extraction recipe</em> (the command to dump a JSONL from a live source) is validated only for the two formats marked ✓ in v0.3.0 — the others depend on third-party SDK versions and are pending live validation.</p>
+    <p>Seven adapters ship in <code>agingbench/telemetry/adapters/</code>. Each normalizes its native trace shape into a canonical <code>TelemetryRecord</code> stream that downstream inference consumes format-agnostically. Adapters all pass fixture-level parse tests; the <em>extraction recipe</em> (the command to dump a JSONL from a live source) is validated only for the two formats marked ✓ in v0.3.0 — the others depend on third-party SDK versions and are pending live validation.</p>
     <table class="schema-table">
       <thead><tr><th>format</th><th>recipe status</th><th>input shape</th></tr></thead>
       <tbody>
@@ -284,13 +284,13 @@
         <tr><td><code>openhands</code></td>        <td>ⓘ reference</td><td>OpenHands SDK event log: <code>{source, action, observation, llm_metrics}</code> per event.</td></tr>
         <tr><td><code>langfuse</code></td>         <td>ⓘ reference</td><td>Langfuse SDK exports or REST-API JSON downloads; accepts both camelCase and snake_case field names.</td></tr>
         <tr><td><code>langsmith</code></td>       <td>ⓘ reference</td><td>Routed through <code>generic</code>; user is responsible for reshaping LangSmith run JSON to the generic field tuple.</td></tr>
-        <tr><td><code>otlp</code></td>            <td>ⓘ reference</td><td>OpenTelemetry JSON spans; recognises both the new <code>gen_ai.*</code> semconv and the legacy <code>llm.*</code> namespace.</td></tr>
+        <tr><td><code>otlp</code></td>            <td>ⓘ reference</td><td>OpenTelemetry JSON spans; recognizes both the new <code>gen_ai.*</code> semconv and the legacy <code>llm.*</code> namespace.</td></tr>
       </tbody>
     </table>
     <p class="muted-line">Recipe-status legend: <strong>✓ verified</strong> = recipe tested end-to-end against a real source in v0.3.0; <strong>ⓘ reference</strong> = adapter parses correctly against fixtures, but the documented extraction command depends on SDK / exporter versions and hasn't been live-validated. If you already have a JSONL of the matching shape, the parser handles it regardless.</p>
 
     <h3 class="subsection">Trace preprocessing (Claude Code only)</h3>
-    <p>Claude Code stores each conversation as a separate <code>&lt;uuid&gt;.jsonl</code> under <code>~/.claude/projects/&lt;encoded-cwd&gt;/</code>. To analyse cross-session aging, those fragments must be concatenated into a single timestamp-sorted JSONL. The bundled helper does it in one command (other adapters already export a single file, so they don't need this step):</p>
+    <p>Claude Code stores each conversation as a separate <code>&lt;uuid&gt;.jsonl</code> under <code>~/.claude/projects/&lt;encoded-cwd&gt;/</code>. To analyze cross-session aging, those fragments must be concatenated into a single timestamp-sorted JSONL. The bundled helper does it in one command (other adapters already export a single file, so they don't need this step):</p>
     <pre class="code-block"><code>python -m agingbench.telemetry.prepare_trace ~/.claude/projects/&lt;your-project-dir&gt;
 # → wrote ~/.claude/projects/&lt;your-project-dir&gt;/agingbench_trace.jsonl (N events)</code></pre>
     <p class="muted-line">Source: <code>agingbench/telemetry/prepare_trace.py</code>. Python API: <code>from agingbench.telemetry import prepare_trace; out = prepare_trace("~/.claude/projects/&lt;dir&gt;")</code>.</p>

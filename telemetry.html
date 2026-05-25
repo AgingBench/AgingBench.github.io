@@ -151,7 +151,7 @@
         <h4>Reading a per-mechanism trajectory</h4>
         <ul>
           <li><strong>X-axis</strong> — session index (0 = first session in the trace, increasing left → right). One point per session that produced enough signal to score.</li>
-          <li><strong>Y-axis</strong> — the mechanism's primary structural signal, normalised to <code>[0, 1]</code>. <em>Higher Y is not always worse</em>: each metric has its own polarity, so always read the <strong>verdict</strong> pill rather than the slope sign alone.</li>
+          <li><strong>Y-axis</strong> — the mechanism's primary structural signal, normalized to <code>[0, 1]</code>. <em>Higher Y is not always worse</em>: each metric has its own polarity, so always read the <strong>verdict</strong> pill rather than the slope sign alone.</li>
           <li><strong>Slope</strong> — per-session OLS rate (units of Y per session). Tells you the <em>direction and pace</em> of change. Sign meaning depends on the metric: e.g. compression's <code>context_noise_ratio</code> rising = bad; revision's <code>tool_argument_specificity</code> rising = good.</li>
           <li><strong>Verdict</strong> — saturation-aware enum (<code>healthy</code> / <code>weak</code> / <code>adequate</code> / <code>strong degradation</code> / <code>underpowered</code> / <code>no_test_fired</code>). This is the canonical read; the curve and slope are evidence for it. <code>underpowered</code> = not enough data to score; <code>no_test_fired</code> = the mechanism's structural preconditions never appeared in the trace.</li>
         </ul>
@@ -173,7 +173,7 @@
               <td><strong>Interference</strong></td>
               <td><code>tool_kl</code> + <code>lineage_continuity_drop</code> + embedding <code>anchor_drift</code></td>
               <td><code>m_interference_mean</code> — probe accuracy on facts inside scripted confusable clusters</td>
-              <td>Indirect (behaviour drift, not collision)</td>
+              <td>Indirect (behavior drift, not collision)</td>
             </tr>
             <tr>
               <td><strong>Revision</strong></td>
