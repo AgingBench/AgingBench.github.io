@@ -649,12 +649,11 @@ __telem_probe_n_outcomes = len(_probe.outcome_events)
         const audit = (lastResult.card && lastResult.card.trace_audit) || {};
         const hb = audit.headline || {};
         const dm = audit.dominant_mechanism || {};
-        const lines = ["My agent's Lifespan Card:"];
+        const lines = ["My agent's lifespan AgingCard:"];
         if (hb.label)  lines.push("• " + hb.label);
-        if (dm.dominant && audit.signature) {
-          lines.push("• Dominant: " + dm.dominant + " (" + audit.signature + ")");
-        }
-        if (audit.repair) lines.push("• Repair: " + audit.repair);
+        if (dm.dominant) lines.push("• Dominant mechanism: " + dm.dominant);
+        if (audit.signature) lines.push("• Diagnostic signature: " + audit.signature);
+        if (audit.repair) lines.push("• Recommended repair: " + audit.repair);
         lines.push("");
         lines.push("Check yours @ AgingBench Lifespan Check");
         const text = lines.join("\n");
