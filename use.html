@@ -98,13 +98,18 @@ agingbench run \
     </ul>
 
     <h3 class="subsection">Bring your own agent</h3>
-    <p>Custom agents drop in by subclassing <code>AgentAdapter</code> and pointing your SUT YAML at it. You don't modify AgingBench code; you write a thin adapter that translates <code>send_message()</code> into your agent's API:</p>
-    <div class="code-block"><code>agingbench run \
-  --scenario s7_research_notes \
-  --sut my_sut.yaml \
-  --agent my_pkg.agents:MyAgent \
-  --seeds 3 --card</code></div>
-    <p class="muted-line" style="margin-top: 10px;"><a href="docs.html">See the docs</a> for the <code>AgentAdapter</code> interface contract and a complete example.</p>
+    <p>Custom agents drop in by subclassing <code>AgentAdapter</code> (two required methods: <code>send_message</code>, <code>reset_session</code>) and referencing your class from the SUT YAML's <code>adapter:</code> block. You don't modify AgingBench code.</p>
+    <p>Start from the runnable template at <a href="https://github.com/VITA-Group/AgingBench/blob/main/prototype/examples/byo_agent_minimal.py"><code>examples/byo_agent_minimal.py</code></a> — copy it, replace the stub <code>send_message</code> with your agent's call, and point a SUT YAML at it:</p>
+    <div class="code-block"><code># my_sut.yaml
+adapter:
+  type: custom
+  class: my_pkg.my_agent:MyAgent   # importable on PYTHONPATH
+  max_turns: 30                    # any extra keys are forwarded as kwargs
+
+agingbench run --scenario s7_research_notes \
+  --sut my_sut.yaml --seeds 3 --card</code></div>
+    <p class="muted-line" style="margin-top: 10px;">The four bundled adapters — <code>claude_code</code>, <code>openhands</code>, <code>codex</code>, <code>cursor</code> — are full-fat reference implementations of the same ABC, useful when you want to see how an opaque CLI agent is wrapped. See <a href="docs.html">docs</a> for the interface contract.</p>
+    <p class="muted-line" style="margin-top: 6px;"><strong>Opaque-agent caveat:</strong> the optional <code>get_workspace_state</code> / <code>get_memory_text</code> hooks default to <code>{}</code> / <code>""</code>. That's fine — the run still emits a valid AgingCard — but probe scoring then only credits what the agent recites in its reply, so S5/S7 file-survival probes will read as more aged. If your agent writes notes or scratchpads to a known directory, return them from these hooks.</p>
   </div>
 </section>
 
@@ -207,7 +212,7 @@ print(r.card['headline'])"</pre>
       <article class="t1-track-card">
         <div class="t1-track-letter">B</div>
         <h4>Memory policy <span class="status beta">v1.1 CLI</span></h4>
-        <p>Subclass <code>MemoryPolicy</code>, fix the model. <em>Does this memory backbone reduce aging?</em> The track for memory-systems research. Set <code>memory_policy.type</code> in the SUT YAML today; first-class <code>--memory-policy</code> flag in v1.1.</p>
+        <p>Subclass <code>MemoryPolicy</code>, fix the model. <em>Does this memory backbone reduce aging?</em> The track for memory-systems research. Set <code>memory_policy.type</code> in the SUT YAML today; first-class <code>--memory-policy</code> flag in v1.1. Runnable template: <a href="https://github.com/VITA-Group/AgingBench/blob/main/prototype/examples/byo_memory_minimal.py"><code>examples/byo_memory_minimal.py</code></a>.</p>
       </article>
 
       <article class="t1-track-card">
