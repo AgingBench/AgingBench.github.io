@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.31" />
+  <link rel="stylesheet" href="assets/css/main.css?v=v1.2.33" />
 </head>
 <body data-page="telemetry">
 
@@ -31,7 +31,7 @@
     </nav>
     <div class="resource-buttons">
       <a href="https://arxiv.org/abs/2605.XXXXX" class="btn" target="_blank" rel="noopener">📄 arXiv</a>
-      <a href="https://github.com/AgingBench/AgingBench" class="btn">💻 Code</a>
+      <a href="https://github.com/VITA-Group/AgingBench" class="btn">💻 Code</a>
       <a href="index.html#cite" class="btn">BibTeX</a>
     </div>
   </div>
@@ -211,8 +211,8 @@
           <span class="friction-badge friction-low">drop-in · verified</span>
         </header>
         <p class="recipe-what">Files Claude Code already writes — no export step. Each <code>.jsonl</code> = one conversation; we bundle them all into one timestamp-sorted trace for cross-session aging signal.</p>
-        <pre class="recipe-cmd"># Cross-platform (macOS / Linux / Windows) — one command:
-pip install agingbench
+        <pre class="recipe-cmd"># Cross-platform (macOS / Linux / Windows) — install AgingBench, then prepare your trace:
+pip install "git+https://github.com/VITA-Group/AgingBench.git@v0.3.0#subdirectory=prototype"
 python -m agingbench.telemetry.prepare_trace ~/.claude/projects/&lt;your-project-dir&gt;
 # → wrote ~/.claude/projects/&lt;your-project-dir&gt;/agingbench_trace.jsonl (N events)
 
@@ -267,6 +267,6 @@ dir %USERPROFILE%\.claude\projects # Windows (cmd)</pre>
   </div>
 </footer>
 
-<script src="assets/js/telemetry_demo.js?v=v1.2.31"></script>
+<script src="assets/js/telemetry_demo.js?v=v1.2.33"></script>
 </body>
 </html>
