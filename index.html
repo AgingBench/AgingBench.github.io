@@ -117,7 +117,34 @@
 
 <!-- ========== 3-CTA PANEL ========== -->
 <section class="section" style="padding-top:56px; padding-bottom:24px;">
+  
   <div class="container">
+
+    <div class="ale-questions" style="background: var(--bg); border: 1px solid var(--accent-soft); border-radius: 22px; padding: 2rem 2.2rem 1.6rem; margin: 0 auto; position: relative; box-shadow: 0 10px 30px rgba(181, 74, 43, 0.06);">
+      <span style="position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 24px); background: linear-gradient(120deg, var(--accent), #f4a261); color: #fff; padding: clamp(0.4rem, 1.6vw, 0.6rem) clamp(1rem, 4vw, 2rem); border-radius: 999px; font-weight: 700; font-size: clamp(0.85rem, 3.6vw, 1.7rem); letter-spacing: 0.06em; white-space: nowrap; text-align: center; box-shadow: 0 5px 18px rgba(181, 74, 43, 0.24);">Agent Lifespan Engineering (ALE)</span>
+      <p style="margin: 1.5rem 0 0.9rem; font-weight: 600; color: var(--ink); font-size: 16px;">Three key questions:</p>
+      <ol style="margin: 0; padding-left: 1.3rem; color: var(--ink); line-height: 1.75; font-size: 15.5px;">
+        <li><em>How long</em> does a deployed agent remain reliable?</li>
+        <li><em>How</em> does reliability decay: through <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, or <span class="highlight-pill maintenance">maintenance</span>?</li>
+        <li><em>Where</em> should repair target: <em>writing</em>, <em>retrieval</em>, <em>utilization</em>, or the memory <em>lifecycle</em>?</li>
+      </ol>
+    </div>
+
+    <!-- ========== DISAMBIGUATION CHIPS ========== -->
+    <div style="margin: 28px auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; font-size: 14.5px; color: var(--muted);">
+      <span style="font-weight: 600; letter-spacing: 0.04em; font-size: 12.5px; color: var(--accent);">AgingBench is NOT:</span>
+      <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">biological aging</span>
+      <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">one-shot hallucination</span>
+      <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">just long-context evaluation</span>
+    </div>
+
+  <figure class="intuition-figure">
+      <img class="zoomable" data-zoomable src="assets/img/fig1_updated.png"
+           alt="Fresh deployment → aged agent: input/output stays the same, but memory clutters, signals fade, and the loop closes on itself."/>
+      <figcaption>Fresh deployment vs. aged agent — same model, same input/output surface. After enough sessions, the memory store clutters, signals fade, and the agent starts looping on itself. (Click to enlarge.)</figcaption>
+    </figure>
+    <br>
+
     <h2 class="section-title" style="margin-bottom:8px;">Three ways in</h2>
     <p class="section-lead">AgingBench is a paper, a leaderboard, and a runnable benchmark. Pick the door that matches what you want to do next.</p>
     <div class="cta-grid">
@@ -143,31 +170,8 @@
       </a>
     </div>
 
-    <figure class="intuition-figure">
-      <img class="zoomable" data-zoomable src="assets/img/fig1_updated.png"
-           alt="Fresh deployment → aged agent: input/output stays the same, but memory clutters, signals fade, and the loop closes on itself."/>
-      <figcaption>Fresh deployment vs. aged agent — same model, same input/output surface. After enough sessions, the memory store clutters, signals fade, and the agent starts looping on itself. (Click to enlarge.)</figcaption>
-    </figure>
-    <br>
-    <br>
+    
 
-  <div class="ale-questions" style="background: var(--bg); border: 1px solid var(--accent-soft); border-radius: 22px; padding: 2rem 2.2rem 1.6rem; margin: 0 auto; position: relative; box-shadow: 0 10px 30px rgba(181, 74, 43, 0.06);">
-    <span style="position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: linear-gradient(120deg, var(--accent), #f4a261); color: #fff; padding: 0.45rem 1.5rem; border-radius: 999px; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.08em; white-space: nowrap; box-shadow: 0 4px 14px rgba(181, 74, 43, 0.22);">Agent Lifespan Engineering (ALE)</span>
-    <p style="margin: 0 0 0.9rem; font-weight: 600; color: var(--ink); font-size: 16px;">Three key questions:</p>
-    <ol style="margin: 0; padding-left: 1.3rem; color: var(--ink); line-height: 1.75; font-size: 15.5px;">
-      <li><em>How long</em> does a deployed agent remain reliable?</li>
-      <li><em>How</em> does reliability decay: through <span class="highlight-pill compression">compression</span>, <span class="highlight-pill interference">interference</span>, <span class="highlight-pill revision">revision</span>, or <span class="highlight-pill maintenance">maintenance</span>?</li>
-      <li><em>Where</em> should repair target: <em>writing</em>, <em>retrieval</em>, <em>utilization</em>, or the memory <em>lifecycle</em>?</li>
-    </ol>
-  </div>
-
-  <!-- ========== DISAMBIGUATION CHIPS ========== -->
-  <div style="margin: 28px auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; font-size: 14.5px; color: var(--muted);">
-    <span style="font-weight: 600; letter-spacing: 0.04em; font-size: 12.5px; color: var(--accent);">AgingBench is NOT:</span>
-    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">biological aging</span>
-    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">one-shot hallucination</span>
-    <span style="display: inline-block; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 0.5px;">just long-context evaluation</span>
-  </div>
 
   </div>
 </section>
