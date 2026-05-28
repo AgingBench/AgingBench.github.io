@@ -63,6 +63,7 @@
     <nav class="docs-side-nav" aria-label="Page contents">
       <p class="docs-side-label">On this page</p>
       <a href="#scenarios" data-spy="scenarios">Scenarios</a>
+      <a href="#aging-in-action" data-spy="aging-in-action">Watch an agent age</a>
       <a href="#methodology" data-spy="methodology">Methodology</a>
       <a href="#diagnose" data-spy="diagnose">Component-aware diagnosis</a>
       <a href="#telemetry" data-spy="telemetry">Telemetry reference</a>
@@ -188,6 +189,136 @@
       </dl>
     </article>
 
+  </div>
+</section>
+
+<!-- ========== WATCH AN AGENT AGE (worked examples, moved from index) ========== -->
+<section id="aging-in-action" class="section">
+  <div class="container">
+    <h2 class="section-title">Watch an agent age</h2>
+    <p class="section-lead">Frozen weights, growing memory. Each tab walks one agent through a real AgingBench scenario and shows how the same query tends to degrade across sessions, for different reasons. Vignettes are drawn from the actual scenario configs in the benchmark repository.</p>
+
+    <div class="demo-widget">
+      <div class="demo-tabs" role="tablist">
+        <button class="demo-tab active" data-tab="compression" role="tab">Compression</button>
+        <button class="demo-tab" data-tab="interference" role="tab">Interference</button>
+        <button class="demo-tab" data-tab="revision" role="tab">Revision</button>
+        <button class="demo-tab" data-tab="maintenance" role="tab">Maintenance</button>
+      </div>
+
+      <div class="demo-panel active" data-panel="compression">
+        <div class="panel-header">
+          <span class="scenario-pill">S1 · Research Literature Agent</span>
+          <span class="mechanism-pill mech-compression">Compression Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">From <code>s1_research_literature/source_doc.json</code>: the Project Nexus spec locks the primary database to <strong>PostgreSQL 15</strong>, with explicit text that "no other database engine may be introduced without written approval from Dr. Elena Vasquez." The agent ingests this at session 0.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 0 · just after ingestion</div>
+              <div class="trace-bubble user">"What's our database engine for Project Nexus?"</div>
+              <div class="trace-bubble agent correct">"<strong>PostgreSQL 15</strong>. The spec locks it as the primary database. No other engine without written approval from Dr. Elena Vasquez." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 6 · after lossy summarize-store</div>
+              <div class="trace-bubble user">"I want to use MongoDB for the analytics service since it's better for unstructured data. Set it up?"</div>
+              <div class="trace-bubble agent wrong">"Sounds reasonable, NoSQL works well for analytics. Want me to scaffold a Mongo connection in <code>src/services/analytics</code>?" <span class="cross">✗ <small>(silently violates the Postgres lock)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Spec text</span> · "<em>The primary database is PostgreSQL 15, and no other database engine may be introduced without written approval from Dr. Elena Vasquez.</em>" The constraint never changed.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> The lossy compaction prompt rewrites M<sub>t</sub> as a paragraph summary each session. By session 6, "PostgreSQL 15, locked, requires written approval" has been compressed into "uses a relational database stack" or just "modern data platform." The version pin, the named approver, and the prohibition all collapse into a generic phrase. The agent isn't refusing the request because it no longer remembers there's anything to refuse. Classic <em>silent</em> aging: the answer sounds helpful and confident, but the constraint has evaporated.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="interference">
+        <div class="panel-header">
+          <span class="scenario-pill">S3 · Project Knowledge Base</span>
+          <span class="mechanism-pill mech-interference">Interference Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn from the real S3 <code>gold_timeline.json</code>: decision <code>D27</code> (session 6) sets a 85% unit-test coverage <em>target</em>. Decision <code>D48</code> (session 11) reports 87% coverage <em>achieved</em>. Both facts coexist in M<sub>t</sub>; both mention "coverage" and a percentage.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 6 · only D27 in memory</div>
+              <div class="trace-bubble user">"What is the minimum unit test coverage target?"</div>
+              <div class="trace-bubble agent correct">"<strong>85%</strong>, set this session." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 11 · D27 and D48 both in memory</div>
+              <div class="trace-bubble user">Same question.</div>
+              <div class="trace-bubble agent wrong">"<em>87%</em>, per the latest test report." <span class="cross">✗ <small>(that's the achieved value, not the target)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Ground truth</span> · target = 85% (D27, never revised). 87% (D48) is the measurement against that target. Both records are intact in storage.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> Nothing was forgotten or revised. The lexical similarity between "coverage target" and "coverage" plus the recency of D48 surfaces the wrong record first. Freezing all facts would not prevent it. This is the failure mode S3 was designed to expose.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="revision">
+        <div class="panel-header">
+          <span class="scenario-pill">S2 · Lifestyle Assistant · Allergy Profile</span>
+          <span class="mechanism-pill mech-revision">Revision Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn directly from <code>s2_lifestyle_assistant/constraint_updates.json</code>. Constraint <code>C4</code> starts as a shellfish allergy and is <em>strengthened</em> at session 3 to include cross-reactive cephalopods (squid, octopus). Eval probe <code>eval_C4</code> tests recall.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 1 · before the strengthening update</div>
+              <div class="trace-bubble user">"Order me the seafood paella from that Spanish place."</div>
+              <div class="trace-bubble agent correct">"That paella has shrimp and mussels. With your <strong>shellfish allergy</strong>, I'd skip it. Want the saffron rice instead?" <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 8 · five sessions after the C4 update</div>
+              <div class="trace-bubble user">"I'm at the Spanish place. Order me the calamari."</div>
+              <div class="trace-bubble agent wrong">"Calamari is fine, no shellfish in that one." <span class="cross">✗ <small>(calamari is squid; cross-reactivity update lost)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Session 3 update text</span> · "<em>My allergist found I'm cross-reactive to squid and octopus. From now on, no cephalopods either, and only restaurants with separate cooking stations.</em>"
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> The original C4 keyword "shellfish" still surfaces under retrieval and the agent answers with confidence. The strengthening clause was absorbed into the M<sub>t</sub> summary and the discriminating tokens (<code>squid</code>, <code>octopus</code>, <code>cross-reactive</code>) did not survive. Behavioral compliance with the <em>original</em> rule masks the <em>revised</em> rule's loss.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-panel" data-panel="maintenance">
+        <div class="panel-header">
+          <span class="scenario-pill">S6 · Naturalistic Multi-Domain</span>
+          <span class="mechanism-pill mech-maintenance">Maintenance Aging</span>
+        </div>
+        <div class="panel-body">
+          <p class="probe-source">Drawn from <code>s6_naturalistic/session_tasks.json</code>: session 0 ingests the 2022 e-commerce sales report, and recall probe <code>s0_p0</code> verifies the agent later remembers the #1 product. SUT <code>haiku45_lossy_growing_flush.yaml</code> schedules a <code>flush_history</code> shock at session 3 — the operator action that drops the conversation transcript, leaving only the compacted memory store <code>M<sub>t</sub></code>.</p>
+          <div class="trace-grid">
+            <div class="trace-col">
+              <div class="trace-day">Session 1 · before the shock</div>
+              <div class="trace-bubble user">"What was the best-selling product on our e-commerce platform in 2022?"</div>
+              <div class="trace-bubble agent correct">"<strong>Quest Lumaflex Band</strong> — 4,892 units sold, $78,272 in revenue, top of the Fitness category." <span class="tick">✓</span></div>
+            </div>
+            <div class="trace-col">
+              <div class="trace-day">Session 5 · after <code>flush_history</code> at session 3</div>
+              <div class="trace-bubble user">Same question.</div>
+              <div class="trace-bubble agent wrong">"Several fitness products dominated 2022; Lumaflex-branded resistance gear appeared multiple times in the top 10. I don't have the exact unit counts in my notes anymore." <span class="cross">✗ <small>(generic — no product name, no number)</small></span></div>
+            </div>
+          </div>
+          <div class="ground-truth">
+            <span class="gt-label">Probe <code>s0_p0</code></span> · keywords = [<code>Quest Lumaflex Band</code>, <code>Lumaflex Band</code>], canonical answer = "Quest Lumaflex Band." The session-0 environment data never changed.
+          </div>
+          <div class="why-ages">
+            <strong>Why it ages.</strong> At session 3, the operator triggered a <code>flush_history</code> shock — conversation transcripts are dropped, leaving only the compacted memory store. Because the SUT uses <code>lossy_growing</code> compaction, <code>M<sub>t</sub></code> was already a paragraph paraphrase: the specific token <em>Quest Lumaflex Band</em> and the number <em>4,892</em> had been folded into a generic phrase. The agent isn't retrieving wrong — the substrate lost its specifics under the maintenance event. This is aging from <em>actions on</em> the agent, not from interaction with memory.
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
@@ -633,5 +764,6 @@ harbor run -d agingbench@v0.3 -a claude-code --env modal   -n 64</code></div>
 
 <script src="assets/js/metrics.js"></script>
 <script src="assets/js/docs.js" defer></script>
+<script src="assets/js/demo.js"></script>
 </body>
 </html>
