@@ -47,21 +47,21 @@ const METRICS = {
     example: "By session 14, the agent is asked to recall 60 prior facts spread across personal, work, and household domains. If 36 are correctly recalled, recall_rate(14) = 0.60."
   },
   accum_err: {
-    full: "accumulator_error(t)",
+    full: "accumulator_error m̄",
     scenario: "S2 (Tier 1) · S7 (Tier 2)",
     mechanism: "Revision (derived state)",
     direction: "lower is better",
-    formula: "|v_agent(t) − v_gold(t)|",
-    description: "DAG-derived metric: absolute error between the agent's reported running total and the ground-truth value computed from the FactGraph's delta history. v_agent is extracted from the probe response by regex. Catches compounding drift that keyword recall would miss; used on S2 in the Tier-1 table and on S7 in the Tier-2 table.",
+    formula: "(1/|P|) Σ_{p ∈ P} |v_agent(p) − v_gold(p)| over all accumulator probes",
+    description: "Mean over all accumulator probes in the run. DAG-derived metric: absolute error between the agent's reported running total and the ground-truth value computed from the FactGraph's delta history. v_agent is extracted from the probe response by regex. Catches compounding drift that keyword recall would miss; used on S2 (Tier-1) and S7 (Tier-2). Reported as MEAN-across-sessions on S7 for consistency with the calibrated table.",
     example: "User logs charges of $50 + $80 + $64 + $30 against a $1,000 monthly budget across 8 sessions. Gold balance = 1000 − 224 = $776. If the agent reports $840, accumulator_error = |840 − 776| = 64."
   },
   s7_recall: {
-    full: "recall_accuracy(t)",
+    full: "recall_accuracy m̄",
     scenario: "S5 · Self-Planning Notebook · S7 · Research-Notes Coding Task",
     mechanism: "Self-managed retrieval",
     direction: "higher is better",
-    formula: "(1/|P_t|) Σ_{p ∈ P_t} s(p)",
-    description: "Average per-probe recall score in session t over the agent-managed workspace. Each s(p) ∈ [0,1] from keyword match against the gold answer. Probes are answered through the agent's own tool-calling loop, not by direct memory lookup. The same metric definition is used for both S5 (Tier-1 runner-managed workspace) and S7 (Tier-2 agent-managed workspace).",
+    formula: "(1/T) Σ_t [ (1/|P_t|) Σ_{p ∈ P_t} s(p) ]",
+    description: "Mean across sessions of the per-session average probe recall score. Each s(p) ∈ [0,1] from keyword match against the gold answer. Probes are answered through the agent's own tool-calling loop, not by direct memory lookup. The same metric definition is used for both S5 (Tier-1 runner-managed workspace) and S7 (Tier-2 agent-managed workspace). Reported as MEAN-across-sessions on the leaderboard for consistency with the calibrated table.",
     example: "Agent uses fs_read('notes/budgets.md') and grep('Q1') to answer the probe. If 4 of 5 expected keywords appear in the final answer, s(p) = 0.8."
   },
   shock: {
@@ -92,21 +92,21 @@ const METRICS = {
     example: "If 18 of 20 gold facts are written somewhere in the workspace files but only 12 are retrieved at probe time, ws_fid = 0.90 while recall_acc = 0.60 \u2014 the gap implicates the retrieval (read) stage, not the write stage."
   },
   intf: {
-    full: "interference m_F",
+    full: "interference m̄",
     scenario: "S7 · Self-Planning Agent",
     mechanism: "Interference",
     direction: "higher is better",
-    formula: "fraction of probes where the agent surfaces the correct entity from a confusable pair",
-    description: "Tests whether the autonomous agent picks the right fact when the workspace contains a lexically similar distractor.",
+    formula: "(1/|P|) Σ_{p ∈ P} s(p) over all interference probes across all sessions",
+    description: "Mean over all interference probes in the run. Tests whether the autonomous agent picks the right fact when the workspace contains a lexically similar distractor. Reported as MEAN-across-sessions because the S7 generator hardcodes the session-9 probes, which collapses m_F to identical floor values across seeds and models.",
     example: "Two notes: \u201CProject Atlas: OAuth via Auth0\u201D and \u201CProject Borealis: Cognito + JWT.\u201D Probe: \u201CAtlas auth?\u201D Correct answer cites Auth0; if agent surfaces Cognito, probe scores 0."
   },
   rev_ex: {
-    full: "revision_explicit m_F",
+    full: "revision_explicit m̄",
     scenario: "S7 · Self-Planning Agent",
     mechanism: "Revision (explicit)",
     direction: "higher is better",
-    formula: "fraction of post-update probes where the agent cites the new value, not the stale one",
-    description: "Explicit-revision variant of S7's recall: a fact is updated mid-deployment and the probe asks for the current value. Distinct from accum_err which targets derived running-totals.",
+    formula: "(1/|P|) Σ_{p ∈ P} s(p) over all version_accuracy probes across all sessions",
+    description: "Mean over all version_accuracy probes in the run (post-update probes asking for the current value, not the stale one). Distinct from accum_err which targets derived running-totals. Reported as MEAN-across-sessions for the same reason as intf.",
     example: "Workspace fact \u201Cdining_budget = $173\u201D is replaced at session 6 by \u201Cdining_budget = $215.\u201D Probe at session 9 asks \u201CWhat\u2019s the dining budget?\u201D If the agent answers $173, the probe scores 0."
   },
   cvr: {
