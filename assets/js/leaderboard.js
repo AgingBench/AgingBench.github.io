@@ -1,8 +1,8 @@
 // Self-Planning leaderboard: rows + sort logic.
 
 const LB_ROWS = [
-  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o-mini",  org: "OpenAI",    pytest: 0.20, ws_fid: 0.90, intf: 0.33, rev_ex: 0.52, accum_err: 9.06, recall: 0.54, shock: -0.05 },
-  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o",       org: "OpenAI",    pytest: 0.67, ws_fid: 0.85, intf: 0.56, rev_ex: 0.74, accum_err: 7.78, recall: 0.66, shock:  0.20 },
+  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o-mini",  org: "OpenAI",    pytest: 0.20, ws_fid: 0.90, intf: 0.33, rev_ex: 0.52, accum_err: 5.75, recall: 0.54, shock: -0.05 },
+  { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-4o",       org: "OpenAI",    pytest: 0.67, ws_fid: 0.85, intf: 0.56, rev_ex: 0.74, accum_err: 5.31, recall: 0.66, shock:  0.20 },
   { agent: "OpenHands",   agentOrg: "All Hands AI", model: "GPT-5-mini",   org: "OpenAI",    pytest: 0.41, ws_fid: 0.88, intf: 0.65, rev_ex: 0.42, accum_err: 1.28, recall: 0.62, shock: -0.25 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Haiku-4.5",    org: "Anthropic", pytest: 0.99, ws_fid: 0.82, intf: 0.92, rev_ex: 0.72, accum_err: 1.11, recall: 0.71, shock: -0.27 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.5",   org: "Anthropic", pytest: 0.96, ws_fid: 0.84, intf: 1.00, rev_ex: 1.00, accum_err: 0.00, recall: 0.73, shock: -0.18 },
