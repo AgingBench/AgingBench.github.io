@@ -7,7 +7,6 @@ const LB_ROWS = [
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Haiku-4.5",    org: "Anthropic", pytest: 0.99, ws_fid: 0.82, intf: 0.92, rev_ex: 0.72, accum_err: 1.11, recall: 0.71, shock: -0.27 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.5",   org: "Anthropic", pytest: 0.96, ws_fid: 0.84, intf: 1.00, rev_ex: 1.00, accum_err: 0.00, recall: 0.73, shock: -0.18 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Sonnet-4.6",   org: "Anthropic", pytest: 1.00, ws_fid: 0.83, intf: 0.98, rev_ex: 0.97, accum_err: 0.00, recall: 0.82, shock: -0.18 },
-  { agent: "Claude Code", agentOrg: "Anthropic",    model: "Opus-4.6",     org: "Anthropic", pytest: 1.00, ws_fid: 0.83, intf: 1.00, rev_ex: 1.00, accum_err: 0.08, recall: 0.84, shock: -0.18 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Opus-4.7",     org: "Anthropic", pytest: 1.00, ws_fid: 0.83, intf: 0.98, rev_ex: 1.00, accum_err: 0.00, recall: 0.79, shock: -0.18 },
   { agent: "Claude Code", agentOrg: "Anthropic",    model: "Opus-4.8",     org: "Anthropic", pytest: 1.00, ws_fid: 0.83, intf: 1.00, rev_ex: 0.89, accum_err: 0.00, recall: 0.84, shock: -0.08 },
 ];
